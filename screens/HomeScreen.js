@@ -2,16 +2,12 @@ import React from 'react';
 import {
     Image,
     Platform,
-    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
-    WebView
 } from 'react-native';
-import { WebBrowser } from 'expo';
-import { MonoText } from '../components/StyledText';
-const DomParser = require('react-native-html-parser').DOMParser;
+//const DomParser = require('react-native-html-parser').DOMParser;
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -59,16 +55,15 @@ export default class HomeScreen extends React.Component {
               const start = 6540; const end = 4745;
               const sss = text.slice(start);
               const result = sss.slice(0, end);
-              const arr = result.split('<li').map(i => {
+              const arr = result.split('<li').map((i, index) => {
                   const testOb = {
                       name: getName(i),
                       date: getDate(i),
                       link: getLink(i),
                   };
-                  return testOb;
+                  return index !== 0 && testOb;
               });
               console.log('test: ', arr);
-              //const doc = new DomParser().parseFromString(result,'text/html');
           });
       }).catch((err) => {
           console.log(err);
@@ -77,49 +72,14 @@ export default class HomeScreen extends React.Component {
   render() {
       return (
           <View style={styles.container}>
-              <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                  <View style={styles.welcomeContainer}>
-                  </View>
-                  <View style={styles.getStartedContainer}>
-                      {/*this._maybeRenderDevelopmentModeWarning()*/}
-                  </View>
-              </ScrollView>
+              <View style={styles.welcomeContainer}>
+                  <View style={styles.contentContainer}>
+                      <Text>Hi</Text>
+                  </View>   
+              </View>
           </View>
       );
   }
-
-  _maybeRenderDevelopmentModeWarning() {
-      if (__DEV__) {
-          const learnMoreButton = (
-              <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-              </Text>
-          );
-
-          return (
-              <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-              </Text>
-          );
-      } else {
-          return (
-              <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-              </Text>
-          );
-      }
-  }
-
-  _handleLearnMorePress = () => {
-      WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-      WebBrowser.openBrowserAsync(
-          'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-      );
-  };
 }
 
 const styles = StyleSheet.create({
