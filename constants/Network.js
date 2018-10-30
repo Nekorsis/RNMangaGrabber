@@ -1,0 +1,1 @@
+export const MangaStreamUrl = 'https://readms.net';

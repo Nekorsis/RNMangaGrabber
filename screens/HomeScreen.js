@@ -6,80 +6,88 @@ import {
     Text,
     TouchableOpacity,
     View,
+    FlatList,
+    Linking,
 } from 'react-native';
+import { MangaStreamUrl } from '../constants/Network';
+import { msItemParser } from '../utils/Utils';
+
 //const DomParser = require('react-native-html-parser').DOMParser;
 
 export default class HomeScreen extends React.Component {
-  static navigationOptions = {
-      header: null,
-  };
-  componentDidMount() {
-      const quizUrl = 'https://readms.net/';
-      const myHeaders = new Headers();
-      myHeaders.append('Content-Type', 'text/html');
-      const getLink = (s) => {
-          const start = s.search('href=');
-          const temp = s.slice(start);
-          const end = temp.search('>');
-          const res = temp.slice(0, end).split('=')[1];
-          return res;
-      };
-      const getName = (s) => {
-          const isNew = s.includes('class="active"');
-          if (isNew) {
-              const start = s.search('</i>');
-              const temp = s.slice(start);
-              const end = temp.search('<strong>');
-              const res = temp.slice(4, end);
-              return res;
-          }
-          const start = s.search('</span>');
-          const temp = s.slice(start);
-          const end = temp.search('<strong>');
-          const res = temp.slice(7, end);
-          return res;
-      };
-      const getDate = (s) => {
-          const start = s.search('class="pull-right"') + 18;
-          const temp = s.slice(start);
-          const end = temp.search('</span>');
-          const res = temp.slice(1, end);
-          return res;
-      };
-      fetch(quizUrl,{
-          mode: 'no-cors',
-          method: 'get',
-          headers: myHeaders
-      }).then((response) => {
-          response.text().then((text) => {
-              const start = 6540; const end = 4745;
-              const sss = text.slice(start);
-              const result = sss.slice(0, end);
-              const arr = result.split('<li').map((i, index) => {
-                  const testOb = {
-                      name: getName(i),
-                      date: getDate(i),
-                      link: getLink(i),
-                  };
-                  return index !== 0 && testOb;
-              });
-              console.log('test: ', arr);
-          });
-      }).catch((err) => {
-          console.log(err);
-      });
-  }
-  render() {
-      return (
-          <View style={styles.container}>
-              <View style={styles.welcomeContainer}>
-                  <View style={styles.contentContainer}>
-                      <Text>Hi</Text>
-                  </View>   
-              </View>
-          </View>
-      );
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+            mangaData: null
+        };
+    }
+    componentDidMount() {
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'text/html');
+        const getName = (s) => {
+            const isNew = s.includes('class="active"');
+            if (isNew) {
+                const start = s.search('</i>');
+                const temp = s.slice(start);
+                const end = temp.search('<strong>');
+                const res = temp.slice(4, end);
+                return res;
+            }
+            const start = s.search('</span>');
+            const temp = s.slice(start);
+            const end = temp.search('<strong>');
+            const res = temp.slice(7, end);
+            return res;
+        };
+        fetch(MangaStreamUrl,{
+            mode: 'no-cors',
+            method: 'get',
+            headers: myHeaders
+        }).then((response) => {
+            response.text().then((text) => {
+                const start = 6540; const end = 4745;
+                const sss = text.slice(start);
+                const result = sss.slice(0, end);
+                const arr = result.split('<li').map((i, index) => {
+                    const testOb = {
+                        name: getName(i),
+                        date: msItemParser(i, 'date', 'class="pull-right"', '</span>'),
+                        link: msItemParser(i, 'link', 'href=', '>'),
+                    };
+                    return index !== 0 && testOb;
+                });
+                this.setState({mangaData: arr.filter(i => i)});
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+    openMangaLink = (url) => {
+        Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    }
+    render() {
+        const { mangaData } = this.state;
+        return (
+            <View style={styles.container}>
+                <View style={styles.welcomeContainer}>
+                    <View style={styles.contentContainer}>
+                        {mangaData && <FlatList
+                            data={mangaData}
+                            renderItem={({item}) => {
+                                return (
+                                    <TouchableOpacity>
+                                        <Text>{item.name}</Text>
+                                        <Text>{item.date}</Text>
+                                        <Text onPress={() => {this.openMangaLink(`${MangaStreamUrl}${item.link}`);}}>{`${MangaStreamUrl}${item.link}`}</Text>
+                                    </TouchableOpacity>
+                                );
+                            }}
+                        />}
+                    </View>   
+                </View>
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
