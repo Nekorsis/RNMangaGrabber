@@ -1,20 +1,10 @@
 import { combineReducers } from 'redux';
-import { NavigationActions, createStackNavigator } from 'react-navigation';
-import {
-  reduxifyNavigator,
-  createReactNavigationReduxMiddleware,
-  createNavigationReducer,
-} from 'react-navigation-redux-helpers';
+import { NavigationActions } from 'react-navigation';
 import { initState as initialState } from './../store.js';
 import AppNavigator from './../navigation/AppNavigator.js';
 
 
 const initialNavigatorState = AppNavigator.router.getStateForAction(NavigationActions.init());
-
-
-// const AppNav = createStackNavigator(AppNavigator);
-
-// const navReducer = createNavigationReducer(AppNav);
 
 const appReducer = (state = initialState.appReducer, action) => {
     switch (action.type) {

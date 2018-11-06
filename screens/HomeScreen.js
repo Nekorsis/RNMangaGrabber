@@ -9,6 +9,7 @@ import {
     FlatList,
     Linking,
 } from 'react-native';
+import { connect } from 'react-redux';
 import { MangaStreamUrl } from '../constants/Network';
 import { msItemParser } from '../utils/Utils';
 

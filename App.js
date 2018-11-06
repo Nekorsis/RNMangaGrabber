@@ -1,65 +1,25 @@
-import React, { Component, PureComponent  } from 'react';
+import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import { Provider } from 'react-redux';
-import { connect } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { NavigationActions } from 'react-navigation';
-import { BackHandler } from 'react-native';
 import {
     reduxifyNavigator,
     createReactNavigationReduxMiddleware,
 } from 'react-navigation-redux-helpers';
 import AppNavigator from './AppNavigator';
+import routes from './navigation/AppNavigator';
 import reducer from './reducers/reducers.js';
 
 const reactNavigationMiddleware = createReactNavigationReduxMiddleware('root', state => state.nav);
-const createStoreWithMiddleware = applyMiddleware(thunk, reactNavigationMiddleware)(createStore);
 
-// const store = createStore(
-//     reducer,
-//     applyMiddleware(thunk, reactNavigationMiddleware),
-// );
-const store = createStoreWithMiddleware(reducer);
+const store = createStore(
+    reducer,
+    applyMiddleware(thunk, reactNavigationMiddleware),
+);
 
-export const AppNav = reduxifyNavigator(AppNavigator, 'root');
-// const mapStateToProps = (state) => ({
-//     state: state.nav,
-// });
-// const AppWithNavigationState = connect(mapStateToProps)(AppNav);
-
-class Navigation extends PureComponent {
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
-    }
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
-    }
-onBackPress = () => {
-    const { dispatch, state } = this.props;
-    if (state.index === 0) {
-        return false;
-    }
-    dispatch(NavigationActions.back());
-    return true;
-};
-render() {
-    const navigation = {
-        state: this.props.state,
-        dispatch:this.props.dispatch,
-    };
-    return <AppNav
-        // state={this.props.state}
-        // dispatch={this.props.dispatch}
-    />;
-}
-}
-
-const mapStateToPropss = state => ({
-    state: state.nav,
-});
-const ConnectedApp = connect(mapStateToPropss)(Navigation);
+export const ReduxifiedNav = reduxifyNavigator(routes, 'root');
 
 export default class App extends React.Component {
   state = {
@@ -82,8 +42,7 @@ export default class App extends React.Component {
               <Provider store={store}>
                   <View style={styles.container}>
                       {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-                      {/* <AppNavigator /> */}
-                      <ConnectedApp />
+                      <AppNavigator />
                   </View>
               </Provider>
           );
