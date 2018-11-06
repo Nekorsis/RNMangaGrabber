@@ -1,10 +1,4 @@
 export const initState = {
-  appReducer: {
-    cards: [],
-  },
-  addCardState: {
-    message: '',
-    defaultMessage: 'New item title...',
-  },
+    mangaData: null,
 };
 export default initState;

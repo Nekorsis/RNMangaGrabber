@@ -2,12 +2,15 @@ import { combineReducers } from 'redux';
 import { NavigationActions } from 'react-navigation';
 import { initState as initialState } from './../store.js';
 import AppNavigator from './../navigation/AppNavigator.js';
-
+import { actionTypes } from '../actions/actions';
 
 const initialNavigatorState = AppNavigator.router.getStateForAction(NavigationActions.init());
 
-const appReducer = (state = initialState.appReducer, action) => {
+const appReducer = (state = initialState, action) => {
     switch (action.type) {
+    case actionTypes.FETCH_MANGA_DATA: {
+        return {...state, mangaData: action.mangaData };
+    }
     default:
         break;
     }

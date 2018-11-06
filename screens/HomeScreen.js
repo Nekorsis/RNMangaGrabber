@@ -11,63 +11,22 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { MangaStreamUrl } from '../constants/Network';
-import { msItemParser } from '../utils/Utils';
+import { bindActionCreator } from '../utils/Utils';
+import { fetchMangaDataAsync } from '../actions/actions';
 
 //const DomParser = require('react-native-html-parser').DOMParser;
 
-export default class HomeScreen extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            mangaData: null
-        };
-    }
+class HomeScreen extends React.Component {
     componentDidMount() {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'text/html');
-        const getName = (s) => {
-            const isNew = s.includes('class="active"');
-            if (isNew) {
-                const start = s.search('</i>');
-                const temp = s.slice(start);
-                const end = temp.search('<strong>');
-                const res = temp.slice(4, end);
-                return res;
-            }
-            const start = s.search('</span>');
-            const temp = s.slice(start);
-            const end = temp.search('<strong>');
-            const res = temp.slice(7, end);
-            return res;
-        };
-        fetch(MangaStreamUrl,{
-            mode: 'no-cors',
-            method: 'get',
-            headers: myHeaders
-        }).then((response) => {
-            response.text().then((text) => {
-                const start = 6540; const end = 4745;
-                const sss = text.slice(start);
-                const result = sss.slice(0, end);
-                const arr = result.split('<li').map((i, index) => {
-                    const testOb = {
-                        name: getName(i),
-                        date: msItemParser(i, 'date', 'class="pull-right"', '</span>'),
-                        link: msItemParser(i, 'link', 'href=', '>'),
-                    };
-                    return index !== 0 && testOb;
-                });
-                this.setState({mangaData: arr.filter(i => i)});
-            });
-        }).catch((err) => {
-            console.log(err);
-        });
+        this.props.getMangaData(MangaStreamUrl);
     }
+
     openMangaLink = (url) => {
         Linking.openURL(url).catch(err => console.error('An error occurred', err));
     }
+
     render() {
-        const { mangaData } = this.state;
+        const { mangaData } = this.props.store;
         return (
             <View style={styles.container}>
                 <View style={styles.welcomeContainer}>
@@ -90,6 +49,16 @@ export default class HomeScreen extends React.Component {
         );
     }
 }
+
+const mapStateToProps = state => ({
+    store: state.appReducer,
+});
+
+const mapDispatchToProps = dispatch => ({
+    getMangaData: bindActionCreator(fetchMangaDataAsync, dispatch),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
+
 
 const styles = StyleSheet.create({
     container: {
