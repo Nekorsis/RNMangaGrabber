@@ -22,7 +22,8 @@ class HomeScreen extends React.Component {
     }
 
     openMangaLink = (url) => {
-        Linking.openURL(url).catch(err => console.error('An error occurred', err));
+        this.props.navigation.navigate('WebView', { viewUrl: url });
+        // Linking.openURL(url).catch(err => console.error('An error occurred', err));
     }
 
     render() {
