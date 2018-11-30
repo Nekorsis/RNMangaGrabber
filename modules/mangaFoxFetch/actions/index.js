@@ -1,11 +1,12 @@
 import { msItemParser } from '../../../utils/Utils';
-import { mangaPath } from '../config/Network';
+import { mangaPath, searchPath } from '../config/Network';
 
 
 export const actionTypes = {
     FETCH_MANGA_DATA: 'FETCH_MANGA_DATA',
     FETCH_MANGA_LIST: 'FETCH_MANGA_LIST',
     SET_MANGA_LIST: 'SET_MANGA_LIST',
+    SET_MANGA_GENRES: 'SET_MANGA_GENRES',
 };
 
 export const saveMangaData = (mangaData) => {
@@ -31,8 +32,34 @@ export const fetchMangaDataAsync = (url) => {
     };
 };
 
-export const fetchMangaListAsync = (url) => {
+export const fetchMangaGenresAsync = (callback) => {
     return function(dispatch) {
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'text/html');
+        return fetch(searchPath,{
+            mode: 'no-cors',
+            method: 'get',
+            headers: myHeaders
+        }).then((response) => {
+            response.text().then((text) => {
+                const searchBlock = text.match(/<ul class="tagbt">(.+?)<\/ul>/);
+                const genreBlocks = searchBlock && searchBlock[0].match(/<li>(.+?)<\/li>/g);
+                const genreObjects = genreBlocks.map((item) => {
+                    const dataVal = item.match(/data-val="(.+?)"/);
+                    const name = item.match(/title="(.+?)"/);
+                    return { value: dataVal && dataVal[1], name: name && name[1] };
+                });
+                dispatch(setMangaGenres(genreObjects));
+                callback(genreObjects);
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+    };
+};
+
+export const fetchMangaListAsync = (url) => {
+    return (dispatch) => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
         return fetch(url,{
@@ -41,22 +68,25 @@ export const fetchMangaListAsync = (url) => {
             headers: myHeaders
         }).then((response) => {
             response.text().then((text) => {
-                const blocks = text.split('<li').map((i) => {
-                    const matched = i.match(/<img(.*)a>/);
-                    const imgsrc = matched && matched[0].match(/src="(.*\.jpg|png)"/);
-                    const name = i.match(/title="(.*?)"><img\s/);
-                    const link = i.match(/<a href="\/manga\/(.+?)\/"/);
-                    const itemScore = i.match(/<span class="item-score">(\d+\.\d+)<\/span>/);
+                const blocks = text.split('<li').reduce((accumulator, value) => {
+                    const imgsrc = value.match(/img.+?src="(.+?)".+?<\/a>/);
+                    const name = value.match(/title="(.*?)"><img\s/);
+                    const link = value.match(/<a href="\/manga\/(.+?)\/"/);
+                    const itemScore = value.match(/<span class="item-score">(\d+\.\d+)<\/span>/);
+                    if (!imgsrc || !name ) {
+                        return accumulator;
+                    }
                     const block = { 
                         img: imgsrc && imgsrc[1],
                         name: name && name[1],
                         link: link && mangaPath + link[1], 
                         itemScore: itemScore && itemScore[1] 
                     };
-                    // console.log(link && link[1]);
-                    return block;
-                });
-                const filteredBlocks = blocks.filter((item) => item && item.name !== null);
+                    accumulator = [...accumulator, block];
+                    return accumulator;
+                    //
+                }, []);
+                // const filteredBlocks = blocks.filter((item) => item && item.name !== null);
                 return dispatch(setMangaList(blocks));
             });
         }).catch((err) => {
@@ -70,5 +100,47 @@ export const setMangaList = (mangaList) => {
     return {
         type: actionTypes.SET_MANGA_LIST,
         payload: { mangaList },
+    };
+};
+
+export const setMangaGenres = (mangaGenres) => {
+    return {
+        type: actionTypes.SET_MANGA_GENRES,
+        payload: { mangaGenres },
+    };
+};
+
+export const searchMangaAsync = (filter) => {
+    return (dispatch) => {
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'text/html');
+        return fetch(searchPath + filter,{
+            mode: 'no-cors',
+            method: 'get',
+            headers: myHeaders
+        }).then((response) => {
+            response.text().then((text) => {
+                const blocks = text.split('<li').reduce((accumulator, value) => {
+                    const imgsrc = value.match(/img.+?src="(.+?)".+?<\/a>/);
+                    const name = value.match(/title="(.*?)"><img\s/);
+                    const link = value.match(/<a href="\/manga\/(.+?)\/"/);
+                    const itemScore = value.match(/<span class="item-score">(\d+\.\d+)<\/span>/);
+                    if (!imgsrc || !name ) {
+                        return accumulator;
+                    }
+                    const block = { 
+                        img: imgsrc && imgsrc[1],
+                        name: name && name[1],
+                        link: link && mangaPath + link[1], 
+                        itemScore: itemScore && itemScore[1] 
+                    };
+                    accumulator = [...accumulator, block];
+                    return accumulator;
+                }, []);
+                return dispatch(setMangaList(blocks));
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
     };
 };

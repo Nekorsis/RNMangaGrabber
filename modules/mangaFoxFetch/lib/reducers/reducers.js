@@ -6,6 +6,9 @@ const mangaFoxReducer = (state = initialState, action) => {
     case actionTypes.SET_MANGA_LIST: {
         return {...state, mangaList: action.payload.mangaList };
     }
+    case actionTypes.SET_MANGA_GENRES: {
+        return {...state, mangaGenres: action.payload.mangaGenres };
+    }
     default:
         break;
     }

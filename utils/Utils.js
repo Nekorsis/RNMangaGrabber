@@ -6,6 +6,6 @@ export const msItemParser = (s, searchField, searchStart, searchEnd) => {
     return searchField === 'link' ? res.split('"')[1] : res;
 };
 
-export const bindActionCreator = (actionCreator, dispatch) => (...params) => {
-    dispatch(actionCreator(...params));
-};
+export const bindActionCreator = (actionCreator, dispatch) => (...params) => (
+    dispatch(actionCreator(...params))
+);
