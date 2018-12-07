@@ -146,12 +146,15 @@ export const getMangaChaptersList = (url) => {
     return (dispatch) => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
+        // autocheck for adult manga
+        myHeaders.append('Cookie', 'isAdult=1;');
         return fetch(url,{
             mode: 'no-cors',
             method: 'get',
-            headers: myHeaders
+            headers: myHeaders,
         }).then((response) => {
             response.text().then((text) => {
+                try {
                 const searchBlock = text.match(/<ul class="detail-main-list">(.+?)<\/ul>/);
                 const genreBlocks = searchBlock && searchBlock[0].match(/<li(.+?)<\/li>/g);
                 const blocks = genreBlocks.reduce((accumulator, value, index) => {
@@ -169,6 +172,9 @@ export const getMangaChaptersList = (url) => {
                     return accumulator;
                 }, []);
                 dispatch(setMangaChaptersList(blocks.reverse()));
+            } catch(err) {
+                console.log(err);
+            }
             });
         }).catch((err) => {
             console.log(err);
