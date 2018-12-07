@@ -9,6 +9,7 @@ export const actionTypes = {
     SET_MANGA_GENRES: 'SET_MANGA_GENRES',
     SET_GENRE_CHECKBOX: 'SET_GENRE_CHECKBOX',
     SET_CHAPTERS_LIST: 'SET_CHAPTERS_LIST',
+    SET_LOADING_STATE: 'SET_LOADING_STATE',
 };
 
 export const saveMangaData = (mangaData) => {
@@ -144,6 +145,7 @@ export const searchMangaAsync = (filter) => {
 
 export const getMangaChaptersList = (url) => {
     return (dispatch) => {
+        dispatch(setLoadingState(true, 'mangaChapters'));
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
         // autocheck for adult manga
@@ -193,5 +195,12 @@ export const setMangaChaptersList = (mangaChaptersList) => {
     return {
         type: actionTypes.SET_CHAPTERS_LIST,
         payload: { mangaChaptersList },
+    };
+};
+
+export const setLoadingState = (isLoading, name) => {
+    return {
+        type: actionTypes.SET_LOADING_STATE,
+        payload: { isLoading, name },
     };
 };

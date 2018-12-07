@@ -9,6 +9,10 @@ const mangaFoxReducer = (state = initialState, action) => {
     case actionTypes.SET_MANGA_GENRES: {
         return { ...state, mangaGenres: action.payload.mangaGenres };
     }
+    case actionTypes.SET_LOADING_STATE: {
+        const { isLoading, name } = action.payload;
+        return { ...state, [name] : {...state[name], isLoading } };
+    }
     case actionTypes.SET_GENRE_CHECKBOX: {
         const { index, isActive } = action.payload;
         if(state.mangaGenres && state.mangaGenres[index]) {
@@ -26,7 +30,7 @@ const mangaFoxReducer = (state = initialState, action) => {
     }
     case actionTypes.SET_CHAPTERS_LIST: {
         const { mangaChaptersList } = action.payload;
-        return { ...state, mangaChaptersList};
+        return { ...state, mangaChapters: { mangaChaptersList, isLoading: false }, };
     }
     default:
         break;

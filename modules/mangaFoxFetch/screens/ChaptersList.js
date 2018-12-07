@@ -17,36 +17,36 @@ import { getMangaChaptersList } from '../actions';
 //const DomParser = require('react-native-html-parser').DOMParser;
 
 class ChaptersList extends React.Component {
- componentDidMount() {
-     const { params: { manga } = {} } =  this.props.navigation.state;
-     if (manga) {
-        this.props.getMangaChaptersList(manga.link);
-     }
- }
+    componentDidMount() {
+        const { params: { manga } = {} } =  this.props.navigation.state;
+        if (manga) {
+            this.props.getMangaChaptersList(manga.link);
+        }
+    }
 
- keyExtractor = (item, index) => item.name || index.toString();
+    keyExtractor = (item, index) => item.name || index.toString();
 
- render() {
-    const { mangaChaptersList } = this.props.store;
-    return (
-        mangaChaptersList &&
-        <View>
-            <FlatList
-                data={mangaChaptersList}
-                keyExtractor={this.keyExtractor}
-                renderItem={({item}) => {
-                    return (
-                        <TouchableOpacity style={styles.touchableOpacity}>
-                            <View style={styles.itemTextContainer}>
-                                <Text style={styles.itemText}>{`${item.name}`}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    );
-                }}
-            />
-        </View>
-    );
- }
+    render() {
+        const { mangaChapters: { mangaChaptersList, isLoading } = {} } = this.props.store;
+        return (
+            !isLoading &&
+            <View>
+                <FlatList
+                    data={mangaChaptersList}
+                    keyExtractor={this.keyExtractor}
+                    renderItem={({item}) => {
+                        return (
+                            <TouchableOpacity style={styles.touchableOpacity}>
+                                <View style={styles.itemTextContainer}>
+                                    <Text style={styles.itemText}>{`${item.name}`}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
+            </View>
+        );
+    }
 }
 
 const mapStateToProps = state => ({
