@@ -12,15 +12,15 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { mangaStreamUrl, mangaDirectoryUrl, searchPath } from '../config/Network';
-import { fetchMangaDataAsync, fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync } from '../actions';
+import { mangaDirectoryUrl } from '../config/Network';
+import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox } from '../actions';
 
 //const DomParser = require('react-native-html-parser').DOMParser;
 
 class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { finderIsOpened: false, currentPage: 1, isLoading: false, genres: null };
+        this.state = { finderIsOpened: false, currentPage: 1, isLoading: false };
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
@@ -33,21 +33,11 @@ class HomeScreen extends React.Component {
 
     initializeFilter = async () => {
         const { getMangaGenres } = this.props;
-        getMangaGenres(this.initFilter);
-        // this.filter = new Filter(this.props.mangaGenres);
+        getMangaGenres();
     }
 
-    initFilter = (gen) => {
-        const genres = gen.map((item, index) => {
-            return { name: item.name, value: item.value, isActive: false, index };
-        });
-
-        this.setState({ genres });
-    }
-
-    openMangaLink = (url) => {
-        this.props.navigation.navigate('WebView', { viewUrl: url });
-        // Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    openMangaLink = (manga) => {
+        this.props.navigation.navigate('ChaptersList', { manga });
     }
 
     // TODO handle next page when searching;
@@ -55,10 +45,8 @@ class HomeScreen extends React.Component {
         const { currentPage } = this.state;
         const nextPage = currentPage + 1;
         this.setState({ currentPage: nextPage, isLoading: true });
-        console.log('Next page loading lul');
         await this.props.getMangaList(mangaDirectoryUrl + `/${nextPage}.html`);
         this.setState({ isLoading: false });
-        console.log('Next page loaded lul');
     }
 
     onPressPrevPage = async () => {
@@ -68,40 +56,45 @@ class HomeScreen extends React.Component {
         }
         const nextPage = currentPage - 1;
         this.setState({ currentPage: nextPage, isLoading: true });
-        console.log('Prev page loading lul');
         await this.props.getMangaList(mangaDirectoryUrl + `/${nextPage}.html`);
         this.setState({ isLoading: false });
-        console.log('Prev page loaded lul');
     }
 
     generateGenreCheckboxes = () => {
-        const { genres } = this.state;
-        if (genres === null || genres === undefined) {
+        const { mangaGenres } = this.props.store;
+        if (mangaGenres === null || mangaGenres === undefined) {
             return;
         }
-        return genres.map((item) => (
-            <View key={item.index} style={styles.checkbox}>
+        return (<FlatList
+        style={styles.flatListCheckboxes}
+        numColumns={3}
+        data={mangaGenres}
+        keyExtractor={this.keyExtractor}
+        renderItem={({item}) => {
+            return (
+                <View key={item.index} style={styles.checkbox}>
                 <CheckBox value={item.isActive} onValueChange={() => this.changeCheckbox(item.index)} />
-                <Text>
+                <Text style={styles.checkboxText}>
+                    {/* {item.name && item.name.length < 5 ? item.name : item.name.slice(0, 9)} */}
                     {item.name}
                 </Text>
             </View>
-        ));
+            );
+        }}
+    />);
     }
 
     changeCheckbox = (index) => {
-        const genres = this.state.genres;
-        if(genres && genres[index]) {
-            genres[index].isActive = !genres[index].isActive;
+        const { mangaGenres } = this.props.store;
+        if (mangaGenres && mangaGenres[index]) {
+            this.props.changeGenreCheckbox(index, !mangaGenres[index].isActive);
         }
-        this.setState({ genres });
     }
-
 
     // Find should be independent from component?
     onPressStartSearch = () => {
-        const { genres } = this.state;
-        const searchCategories = genres.filter((item) => item.isActive);
+        const { mangaGenres } = this.props.store;
+        const searchCategories = mangaGenres.filter((item) => item.isActive);
         if (searchCategories.length > 1) {
             const addedGenres = searchCategories.reduce((accumulator, item, index) => {
                 if(index === 0) {
@@ -139,7 +132,7 @@ class HomeScreen extends React.Component {
                                         />
                                         <Text style={styles.itemScore}>{item.itemScore}</Text>
                                         <View style={styles.itemTextContainer}>
-                                            <Text style={styles.itemText} onPress={() => {this.openMangaLink(`${item.link}`);}}>{`${item.name}`}</Text>
+                                            <Text style={styles.itemText} onPress={() => { this.openMangaLink(item) }}>{`${item.name}`}</Text>
                                         </View>
                                     </TouchableOpacity>
 
@@ -170,9 +163,11 @@ class HomeScreen extends React.Component {
                                     accessibilityLabel="Learn more about this purple button"
                                 />
                             </TouchableOpacity>
+                            {mangaGenres &&
                             <View style={styles.checkboxes}>
                                 {this.generateGenreCheckboxes()}
                             </View>
+                            }
                         </View>
                         :
                         <View style={styles.finder}>
@@ -191,10 +186,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    getMangaData: bindActionCreators(fetchMangaDataAsync, dispatch),
     getMangaList: bindActionCreators(fetchMangaListAsync, dispatch),
     getMangaGenres: bindActionCreators(fetchMangaGenresAsync, dispatch),
     searchManga: bindActionCreators(searchMangaAsync, dispatch),
+    changeGenreCheckbox: bindActionCreators(setGenreCheckbox, dispatch),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
 
@@ -216,8 +211,11 @@ const styles = StyleSheet.create({
         // paddingTop: 30
     },
     findButton: {
-        width: 150,
-        height: 150,
+        flex: 0.2,
+    },
+    flatListCheckboxes: {
+        // display: 'flex',
+        // flexDirection: 'row',
     },
     checkboxes: {
         display: 'flex',
@@ -230,6 +228,15 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginLeft: 5,
         marginRight: 5,
+        minWidth: 80,
+        display: 'flex',
+        maxWidth: 80,
+        alignItems: 'center',
+        justifyContent: 'center',
+        
+    },
+    checkboxText: {
+        textAlign: 'center',
     },
     itemImage: {
         width: 100,
@@ -282,8 +289,6 @@ const styles = StyleSheet.create({
     finderOpened: {
         left: '30%',
         backgroundColor: 'green',
-        borderColor: 'blue',
-        borderTopWidth: 10,
         height: '100%',
         width: '70%',
         // alignSelf: 'flex-end',
@@ -294,6 +299,8 @@ const styles = StyleSheet.create({
     innerFinderOpened: {
         backgroundColor: 'red',
         flex: 0.2,
+        display: 'flex',
+        flexDirection: 'row',
     },
     innerFinder: {
         backgroundColor: 'red',

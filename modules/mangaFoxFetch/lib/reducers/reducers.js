@@ -4,10 +4,29 @@ import { actionTypes } from '../../actions/index';
 const mangaFoxReducer = (state = initialState, action) => {
     switch (action.type) {
     case actionTypes.SET_MANGA_LIST: {
-        return {...state, mangaList: action.payload.mangaList };
+        return { ...state, mangaList: action.payload.mangaList };
     }
     case actionTypes.SET_MANGA_GENRES: {
-        return {...state, mangaGenres: action.payload.mangaGenres };
+        return { ...state, mangaGenres: action.payload.mangaGenres };
+    }
+    case actionTypes.SET_GENRE_CHECKBOX: {
+        const { index, isActive } = action.payload;
+        if(state.mangaGenres && state.mangaGenres[index]) {
+            return { ...state,
+                mangaGenres: state.mangaGenres.map((item, arrayIndex) => {
+                    if (arrayIndex === index) {
+                        return { ...item, isActive };
+                    }
+                    return item;
+                }),
+            };
+        } else {
+            return state;
+        }
+    }
+    case actionTypes.SET_CHAPTERS_LIST: {
+        const { mangaChaptersList } = action.payload;
+        return { ...state, mangaChaptersList};
     }
     default:
         break;
