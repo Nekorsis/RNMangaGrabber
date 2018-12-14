@@ -1,4 +1,4 @@
-import { mangaPath, searchPath, mangaDirectoryUrl } from '../config/Network';
+import { mangaPath, searchPath } from '../config/Network';
 import { repeatMaxCounter } from '../config/consts';
 
 
@@ -48,7 +48,7 @@ export const fetchMangaGenresAsync = (callback) => {
                 }, []);
                 dispatch(setMangaGenres(blocks));
                 if (callback) {
-                    callback(genreObjects);
+                    callback(blocks);
                 }
             });
         }).catch((err) => {
@@ -206,36 +206,36 @@ export const setLoadingState = (isLoading, name) => {
 
 export const fetchChapter = (url) => {
     return async (dispatch) => {
-            const myHeaders = new Headers();
-            myHeaders.append('Content-Type', 'text/html');
-            const respText = await (await fetch(url,{
-                mode: 'no-cors',
-                method: 'get',
-                headers: myHeaders
-            })).text();
-            const chapterId = respText.match(/chapterid[\s\S]=(.*?);/);
-            const content = respText.match(/meta name="og:url" content="(.*?)"/);
-            const changedContent = content && content[1].replace('mangafox.me','fanfox.net');
-            // const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=1&key=`;
-            let intervalImages;
-            const imagesArray = await new Promise((resolve) => {
-                let images = [];
-                let accumulator = [];
-                let page = 1;
-                intervalImages = setInterval(async () => {
-                    const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
-                    images = await fetchImage({ chapterUrl, url });
-                    if (images && images.length <= 1) {
-                        // clearInterval(intervalImages);
-                        const isDublicate = accumulator[accumulator.length - 1] === images[0];
-                        isDublicate ? resolve(accumulator) : resolve([...accumulator,  ...images ]);
-                    }
-                    accumulator = [...accumulator, ...images];
-                    page += 2;
-                }, 2000);
-            });
-            clearInterval(intervalImages);
-            console.log('imagesArray', imagesArray);
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'text/html');
+        const respText = await (await fetch(url,{
+            mode: 'no-cors',
+            method: 'get',
+            headers: myHeaders
+        })).text();
+        const chapterId = respText.match(/chapterid[\s\S]=(.*?);/);
+        const content = respText.match(/meta name="og:url" content="(.*?)"/);
+        const changedContent = content && content[1].replace('mangafox.me','fanfox.net');
+        // const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=1&key=`;
+        let intervalImages;
+        const imagesArray = await new Promise((resolve) => {
+            let images = [];
+            let accumulator = [];
+            let page = 1;
+            intervalImages = setInterval(async () => {
+                const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
+                images = await fetchImage({ chapterUrl, url });
+                if (images && images.length <= 1) {
+                    // clearInterval(intervalImages);
+                    const isDublicate = accumulator[accumulator.length - 1] === images[0];
+                    isDublicate ? resolve(accumulator) : resolve([...accumulator,  ...images ]);
+                }
+                accumulator = [...accumulator, ...images];
+                page += 2;
+            }, 2000);
+        });
+        clearInterval(intervalImages);
+        console.log('imagesArray', imagesArray);
     };
 };
 
@@ -258,7 +258,7 @@ const fetchImage = ({ url ,chapterUrl }) => {
                     blobResponse = await fetch(chapterUrl, {
                         mode: 'no-cors',
                         method: 'get',
-                        headers: myHeaders,
+                        headers: blobHeaders,
                     });
                     repeatCounter += 1 ;
                     if (blobResponse._bodyBlob._data.size >= 0 || repeatCounter >= repeatMaxCounter) {
@@ -280,4 +280,4 @@ const fetchImage = ({ url ,chapterUrl }) => {
         };
         reader.readAsText(blob);
     });
-}
+};
