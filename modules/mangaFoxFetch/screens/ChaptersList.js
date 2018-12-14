@@ -24,6 +24,8 @@ class ChaptersList extends React.Component {
         }
     }
 
+    openChapter = (chapter) => this.props.navigation.navigate('Chapter', { chapter });
+
     keyExtractor = (item, index) => item.name || index.toString();
 
     render() {
@@ -38,7 +40,7 @@ class ChaptersList extends React.Component {
                         return (
                             <TouchableOpacity style={styles.touchableOpacity}>
                                 <View style={styles.itemTextContainer}>
-                                    <Text style={styles.itemText}>{`${item.name}`}</Text>
+                                    <Text onPress={() => this.openChapter(item)} style={styles.itemText}>{`${item.name}`}</Text>
                                 </View>
                             </TouchableOpacity>
                         );

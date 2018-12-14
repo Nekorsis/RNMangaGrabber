@@ -66,22 +66,22 @@ class HomeScreen extends React.Component {
             return;
         }
         return (<FlatList
-        style={styles.flatListCheckboxes}
-        numColumns={3}
-        data={mangaGenres}
-        keyExtractor={this.keyExtractor}
-        renderItem={({item}) => {
-            return (
-                <View key={item.index} style={styles.checkbox}>
-                <CheckBox value={item.isActive} onValueChange={() => this.changeCheckbox(item.index)} />
-                <Text style={styles.checkboxText}>
-                    {/* {item.name && item.name.length < 5 ? item.name : item.name.slice(0, 9)} */}
-                    {item.name}
-                </Text>
-            </View>
-            );
-        }}
-    />);
+            style={styles.flatListCheckboxes}
+            numColumns={3}
+            data={mangaGenres}
+            keyExtractor={this.keyExtractor}
+            renderItem={({item}) => {
+                return (
+                    <View key={item.index} style={styles.checkbox}>
+                        <CheckBox value={item.isActive} onValueChange={() => this.changeCheckbox(item.index)} />
+                        <Text style={styles.checkboxText}>
+                            {/* {item.name && item.name.length < 5 ? item.name : item.name.slice(0, 9)} */}
+                            {item.name}
+                        </Text>
+                    </View>
+                );
+            }}
+        />);
     }
 
     changeCheckbox = (index) => {
@@ -132,7 +132,7 @@ class HomeScreen extends React.Component {
                                         />
                                         <Text style={styles.itemScore}>{item.itemScore}</Text>
                                         <View style={styles.itemTextContainer}>
-                                            <Text style={styles.itemText} onPress={() => { this.openMangaLink(item) }}>{`${item.name}`}</Text>
+                                            <Text style={styles.itemText} onPress={() => { this.openMangaLink(item); }}>{`${item.name}`}</Text>
                                         </View>
                                     </TouchableOpacity>
 
