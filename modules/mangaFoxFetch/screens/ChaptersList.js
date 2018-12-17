@@ -38,9 +38,9 @@ class ChaptersList extends React.Component {
                     keyExtractor={this.keyExtractor}
                     renderItem={({item}) => {
                         return (
-                            <TouchableOpacity style={styles.touchableOpacity}>
+                            <TouchableOpacity style={styles.touchableOpacity} onPress={() => this.openChapter(item)}>
                                 <View style={styles.itemTextContainer}>
-                                    <Text onPress={() => this.openChapter(item)} style={styles.itemText}>{`${item.name}`}</Text>
+                                    <Text style={styles.itemText}>{`${item.name}`}</Text>
                                 </View>
                             </TouchableOpacity>
                         );

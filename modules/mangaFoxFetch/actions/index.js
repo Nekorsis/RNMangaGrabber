@@ -10,6 +10,7 @@ export const actionTypes = {
     SET_GENRE_CHECKBOX: 'SET_GENRE_CHECKBOX',
     SET_CHAPTERS_LIST: 'SET_CHAPTERS_LIST',
     SET_LOADING_STATE: 'SET_LOADING_STATE',
+    SAVE_CHAPTER_IMAGES: 'SAVE_CHAPTER_IMAGES',
 };
 
 export const saveMangaData = (mangaData) => {
@@ -59,6 +60,7 @@ export const fetchMangaGenresAsync = (callback) => {
 
 export const fetchMangaListAsync = (url) => {
     return (dispatch) => {
+        dispatch(setLoadingState(true, 'mangaList'));
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
         return fetch(url,{
@@ -93,10 +95,10 @@ export const fetchMangaListAsync = (url) => {
 };
 
 
-export const setMangaList = (mangaList) => {
+export const setMangaList = (list) => {
     return {
         type: actionTypes.SET_MANGA_LIST,
-        payload: { mangaList },
+        payload: { list },
     };
 };
 
@@ -207,6 +209,7 @@ export const setLoadingState = (isLoading, name) => {
 export const fetchChapter = (url) => {
     return async (dispatch) => {
         const myHeaders = new Headers();
+        dispatch(setLoadingState(true, 'imagesInfo'));
         myHeaders.append('Content-Type', 'text/html');
         const respText = await (await fetch(url,{
             mode: 'no-cors',
@@ -216,27 +219,47 @@ export const fetchChapter = (url) => {
         const chapterId = respText.match(/chapterid[\s\S]=(.*?);/);
         const content = respText.match(/meta name="og:url" content="(.*?)"/);
         const changedContent = content && content[1].replace('mangafox.me','fanfox.net');
-        // const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=1&key=`;
-        let intervalImages;
-        const imagesArray = await new Promise((resolve) => {
-            let images = [];
-            let accumulator = [];
-            let page = 1;
-            intervalImages = setInterval(async () => {
-                const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
-                images = await fetchImage({ chapterUrl, url });
-                if (images && images.length <= 1) {
-                    // clearInterval(intervalImages);
-                    const isDublicate = accumulator[accumulator.length - 1] === images[0];
-                    isDublicate ? resolve(accumulator) : resolve([...accumulator,  ...images ]);
-                }
-                accumulator = [...accumulator, ...images];
-                page += 2;
-            }, 2000);
-        });
-        clearInterval(intervalImages);
-        console.log('imagesArray', imagesArray);
+        const imagesArray = await recursiveTimeoutFetchChapter({ url, chapterId, changedContent });
+        dispatch(saveChapterImages(imagesArray));
     };
+};
+
+export const saveChapterImages = (imagesArray) => {
+    return {
+        type: actionTypes.SAVE_CHAPTER_IMAGES,
+        payload: { imagesArray },
+    };
+};
+
+const recursiveTimeoutFetchChapter = async ({ url, chapterId, changedContent }) => {
+    return new Promise((resolve) => {
+    let images = [];
+    let accumulator = [];
+    let page = 1;
+    const timeout = () => {
+        setTimeout(async () => {
+            const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
+            images = await fetchImage({ chapterUrl, url });
+            const slicedArray = accumulator.slice(accumulator.length - images.length, accumulator.length);
+            const preparedImages = images.reduce((reduce, item) => {
+                if (slicedArray.some((someItem) => item.url === someItem.url)) {
+                    return reduce;
+                }
+                return [...reduce, item];
+                }, []);
+
+            if (images && images.length <= 1) {
+                accumulator = [...accumulator,  ...preparedImages ];
+                resolve(accumulator);
+                return;
+            }
+            accumulator = [...accumulator, ...preparedImages];
+            page += 1;
+            timeout();
+        }, 100);
+    };
+    timeout();
+});
 };
 
 const fetchImage = ({ url ,chapterUrl }) => {
@@ -265,7 +288,7 @@ const fetchImage = ({ url ,chapterUrl }) => {
                         fetchResolve(blobResponse);
                         // clearInterval(interval);
                     }
-                }, 2000);
+                }, 500);
             });
             clearInterval(interval);
         }
@@ -273,10 +296,8 @@ const fetchImage = ({ url ,chapterUrl }) => {
         var reader = new FileReader();
         reader.onload = function() {
             const ev = eval(reader.result);
-            console.log('ev', ev);
             const img = 'http:' + ev[0];
-            ev[1] ? resolve([img, ev[1]]) : resolve([img]);
-            // resolve([img, ev[1]]);
+            ev[1] ? resolve([{ url: img }, { url: ev[1] }]) : resolve([{ url: img }]);
         };
         reader.readAsText(blob);
     });
