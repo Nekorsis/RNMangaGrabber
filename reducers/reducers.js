@@ -1,9 +1,17 @@
 import { combineReducers } from 'redux';
 import { NavigationActions } from 'react-navigation';
-import { initState as initialState } from './../store.js';
-import AppNavigator from './../navigation/AppNavigator.js';
+import { initState as initialState } from '../store.js';
+import AppNavigator from '../navigation/AppNavigator.js';
 import { actionTypes } from '../actions/actions';
 import mangaFoxReducer from '../modules/mangaFoxFetch/lib/reducers/reducers';
+
+import modules from '../modules';
+
+// creating object with module navigators
+const modulesReducersObj = modules.reduce((accumulator, mod) => {
+    const { reducer, moduleName } = mod;
+    return { ...accumulator, [moduleName + 'Reducer']: reducer };
+}, {});
 
 const initialNavigatorState = AppNavigator.router.getStateForAction(NavigationActions.init());
 
@@ -25,7 +33,7 @@ const navReducer = (state = initialNavigatorState, action) => {
 const reducer = combineReducers({
     appReducer,
     nav: navReducer,
-    mangaFoxReducer: mangaFoxReducer,
+    ...modulesReducersObj,
 });
 
 export default reducer;

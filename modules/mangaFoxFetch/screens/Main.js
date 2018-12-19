@@ -18,10 +18,11 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox } from '../actions';
-import right_arrow from '../../../assets/images/right_arrow.png'
+import right_arrow from '../../../assets/images/right_arrow.png';
+import { screenNames } from '../config/consts';
 import Filter from '../lib/Filter'; 
 
-class HomeScreen extends React.Component {
+class Main extends React.Component {
     constructor(props) {
         super(props);
         this.filter = new Filter();
@@ -42,7 +43,7 @@ class HomeScreen extends React.Component {
     }
 
     openMangaLink = (manga) => {
-        this.props.navigation.navigate('ChaptersList', { manga });
+       this.props.navigation.navigate(screenNames.ChaptersList.name, { manga });
     }
 
     // TODO handle next page when searching;
@@ -195,10 +196,9 @@ const mapDispatchToProps = dispatch => ({
     searchManga: bindActionCreators(searchMangaAsync, dispatch),
     changeGenreCheckbox: bindActionCreators(setGenreCheckbox, dispatch),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
 
 const { width } = Dimensions.get('window');
-console.log('width', width);
 
 const styles = StyleSheet.create({
     container: {

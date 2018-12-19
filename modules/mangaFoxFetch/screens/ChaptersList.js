@@ -13,6 +13,7 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getMangaChaptersList } from '../actions';
+import { screenNames } from '../config/consts';
 
 //const DomParser = require('react-native-html-parser').DOMParser;
 
@@ -24,7 +25,7 @@ class ChaptersList extends React.Component {
         }
     }
 
-    openChapter = (chapter) => this.props.navigation.navigate('Chapter', { chapter });
+    openChapter = (chapter) => this.props.navigation.navigate(screenNames.Chapter.name, { chapter });
 
     keyExtractor = (item, index) => item.name || index.toString();
 
