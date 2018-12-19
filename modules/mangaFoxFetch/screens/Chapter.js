@@ -13,7 +13,7 @@ import {
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { fetchChapter, setLoadingState } from '../actions';
+import { fetchChapter, setLoadingState, rejectChapterLoad } from '../actions';
 
 class Chapter extends React.Component {
     componentDidMount() {
@@ -23,6 +23,7 @@ class Chapter extends React.Component {
 
     componentWillUnmount() {
         this.props.changeLoadingState(true, 'imagesInfo');
+        this.props.rejectChapterLoad();
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
@@ -46,6 +47,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     fetchChapter: bindActionCreators(fetchChapter, dispatch),
     changeLoadingState: bindActionCreators(setLoadingState, dispatch),
+    rejectChapterLoad: bindActionCreators(rejectChapterLoad, dispatch),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Chapter);
 

@@ -32,6 +32,10 @@ const mangaFoxReducer = (state = initialState, action) => {
             return state;
         }
     }
+    case actionTypes.SET_LOADING_CHAPTER: {
+        const { chapter } = action.payload;
+        return { ...state, chapter };
+    }
     case actionTypes.SET_CHAPTERS_LIST: {
         const { mangaChaptersList } = action.payload;
         return { ...state, mangaChapters: { mangaChaptersList, isLoading: false }, };

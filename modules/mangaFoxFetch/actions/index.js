@@ -11,6 +11,7 @@ export const actionTypes = {
     SET_CHAPTERS_LIST: 'SET_CHAPTERS_LIST',
     SET_LOADING_STATE: 'SET_LOADING_STATE',
     SAVE_CHAPTER_IMAGES: 'SAVE_CHAPTER_IMAGES',
+    SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
 };
 
 export const saveMangaData = (mangaData) => {
@@ -206,8 +207,29 @@ export const setLoadingState = (isLoading, name) => {
     };
 };
 
+
+export const setMangaChapter = (chapter) => {
+    return {
+        type: actionTypes.SET_LOADING_CHAPTER,
+        payload: { chapter },
+    };
+};
+
+export const deleteMangaChapter = (chapter) => {
+    return {
+        type: actionTypes.DELETE_LOADING_CHAPTER,
+        payload: { chapter },
+    };
+};
+
+
 export const fetchChapter = (url) => {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
+        let { mangaFoxReducer: { chapter } } = getState();
+        if (chapter) {
+            chapter.cancel('Rejected by another request');
+            dispatch(setMangaChapter(null));
+        }
         const myHeaders = new Headers();
         dispatch(setLoadingState(true, 'imagesInfo'));
         myHeaders.append('Content-Type', 'text/html');
@@ -219,8 +241,19 @@ export const fetchChapter = (url) => {
         const chapterId = respText.match(/chapterid[\s\S]=(.*?);/);
         const content = respText.match(/meta name="og:url" content="(.*?)"/);
         const changedContent = content && content[1].replace('mangafox.me','fanfox.net');
-        const imagesArray = await recursiveTimeoutFetchChapter({ url, chapterId, changedContent });
-        dispatch(saveChapterImages(imagesArray));
+        chapter = recursiveTimeoutFetchChapter({ url, chapterId, changedContent });
+        chapter.promise.then((info) => {
+            dispatch(setMangaChapter(null));
+            if (info) {
+                dispatch(saveChapterImages(info));
+            } else {
+                console.log('then info:', info);
+            }
+        }, rejectedInfo => {
+            dispatch(setMangaChapter(null));
+            console.log('rejection info: ', rejectedInfo);
+        });
+        dispatch(setMangaChapter(chapter));
     };
 };
 
@@ -231,14 +264,33 @@ export const saveChapterImages = (imagesArray) => {
     };
 };
 
-const recursiveTimeoutFetchChapter = async ({ url, chapterId, changedContent }) => {
-    return new Promise((resolve) => {
+export const rejectChapterLoad = () => {
+    return async (dispatch, getState) => {
+        const { mangaFoxReducer: { chapter } } = getState();
+        if (chapter) {
+            chapter.cancel('Rejected by exit from chapter reader');
+            dispatch(setMangaChapter(null));
+        }
+    }; 
+};
+
+const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent }) => {
+    let timeout;
+    let cancel;
+    return { promise: new Promise((resolve, reject) => {
+    console.log('in promise');
     let images = [];
+    cancel = (reason) => {
+        console.log('in promise cancellation');
+        clearTimeout(timeout);
+        reject(reason);
+    };
     let accumulator = [];
     let page = 1;
-    const timeout = () => {
+    timeout = () => {
         setTimeout(async () => {
             const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
+            // console.log('timeout for ch', chapterUrl);
             images = await fetchImage({ chapterUrl, url });
             const slicedArray = accumulator.slice(accumulator.length - images.length, accumulator.length);
             const preparedImages = images.reduce((reduce, item) => {
@@ -259,7 +311,10 @@ const recursiveTimeoutFetchChapter = async ({ url, chapterId, changedContent }) 
         }, 100);
     };
     timeout();
-});
+}).catch((err) => {
+    clearTimeout(timeout);
+    console.log(err); 
+}), cancel };
 };
 
 const fetchImage = ({ url ,chapterUrl }) => {

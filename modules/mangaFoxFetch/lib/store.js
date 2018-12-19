@@ -13,6 +13,7 @@ export const initState = {
     },
     filter: {
         filterUrl: null,
-    }
+    },
+    chapter: null,
 };
 export default initState;
