@@ -107,7 +107,7 @@ class HomeScreen extends React.Component {
 
     //TODO move filter to actions
     onPressStartSearch = () => {
-        const { store: { mangaGenres }, getMangaList } = this.props;
+        const { getMangaList } = this.props;
         this.setState({ currentPage: 1 });
         console.log('completed filter string', this.filter.getFilterString());
         this.filter.setPage(1);
@@ -116,12 +116,11 @@ class HomeScreen extends React.Component {
 
     handleRightArrowPress = () => {
         console.log('handleRightArrowPress');
-        this.scrollView.scrollToEnd()
+        this.scrollView.scrollToEnd();
     }
 
     render() {
         const { mangaList : { isLoading, list }, mangaGenres } = this.props.store;
-        console.log('rerender');
         return (
           <ScrollView ref={(ref) => this.scrollView = ref} pagingEnabled horizontal style={styles.container}>
             <View style={styles.contentContainer}>
