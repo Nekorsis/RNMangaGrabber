@@ -8,16 +8,10 @@ const testTemplate = { page: 'page=', title: 'title=', genres: 'genres=', additi
 // TODO clear filter mess in store;
 export default class Filter {
     constructor() {
-        console.log('init filter with templates provided');
         this.filter = { genres: [], page: 1, template: testTemplate, isActive: true };
     }
 
-    init = (dispatch) => {
-        this.dispatch = dispatch;
-    };
-
     addGenre = (genre) => {
-        console.log('generating genres string');
         this.filter.genres = [ ...this.filter.genres, genre ];
     };
 
@@ -52,14 +46,12 @@ export default class Filter {
     };
 
     getFilterString = (currentPage) => {
-        console.log('generating string for the fetch');
         if (currentPage) {
             this.setPage(currentPage);
         }
         const { filter: { genres, template } } = this;
         const { filter: { page } } = this;
         if (genres.length <= 0) {
-            console.log('genres are clear, creating basic directory url');
             return mangaDirectoryUrl + `/${page}.html`;
         }
         return searchPath + `${page > 1 ? `${template.page}${page}&` : ''}${template.title}&${template.genres}${this.correctFilterGenreCount(genres)}&st=0&sort=&stype=1&name_method=cw&name=&author_method=cw&author=&artist_method=cw&artist=&type=&rating_method=eq&rating=&released_method=eq&released=`;

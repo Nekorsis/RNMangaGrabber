@@ -3,8 +3,6 @@ import { repeatMaxCounter } from '../config/consts';
 
 
 export const actionTypes = {
-    FETCH_MANGA_DATA: 'FETCH_MANGA_DATA',
-    FETCH_MANGA_LIST: 'FETCH_MANGA_LIST',
     SET_MANGA_LIST: 'SET_MANGA_LIST',
     SET_MANGA_GENRES: 'SET_MANGA_GENRES',
     SET_GENRE_CHECKBOX: 'SET_GENRE_CHECKBOX',
@@ -14,15 +12,9 @@ export const actionTypes = {
     SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
 };
 
-export const saveMangaData = (mangaData) => {
-    return {
-        type: actionTypes.FETCH_MANGA_DATA,
-        mangaData,
-    };
-};
-
 export const fetchMangaGenresAsync = (callback) => {
     return function(dispatch) {
+        // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
         return fetch(searchPath, {
@@ -62,6 +54,7 @@ export const fetchMangaGenresAsync = (callback) => {
 export const fetchMangaListAsync = (url) => {
     return (dispatch) => {
         dispatch(setLoadingState(true, 'mangaList'));
+        // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
         return fetch(url,{
@@ -112,6 +105,7 @@ export const setMangaGenres = (mangaGenres) => {
 
 export const searchMangaAsync = (filter) => {
     return (dispatch) => {
+        // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
         return fetch(searchPath + filter,{
@@ -149,6 +143,7 @@ export const searchMangaAsync = (filter) => {
 export const getMangaChaptersList = (url) => {
     return (dispatch) => {
         dispatch(setLoadingState(true, 'mangaChapters'));
+        // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
         // autocheck for adult manga
@@ -208,17 +203,17 @@ export const setLoadingState = (isLoading, name) => {
 };
 
 
-export const setMangaChapter = (chapter) => {
+export const setMangaChapter = (chapterPromise) => {
     return {
         type: actionTypes.SET_LOADING_CHAPTER,
-        payload: { chapter },
+        payload: { chapterPromise },
     };
 };
 
-export const deleteMangaChapter = (chapter) => {
+export const deleteMangaChapter = (chapterPromise) => {
     return {
         type: actionTypes.DELETE_LOADING_CHAPTER,
-        payload: { chapter },
+        payload: { chapterPromise },
     };
 };
 
@@ -227,9 +222,9 @@ export const fetchChapter = (url) => {
     return (dispatch, getState) => {
         let cancel;
         let innerPromise;
-        let { mangaFoxReducer: { chapter } } = getState();
-        if (chapter) {
-            chapter.cancel('Rejected by another request');
+        let { mangaFoxReducer: { chapterPromise } } = getState();
+        if (chapterPromise) {
+            chapterPromise.cancel('Rejected by another request');
             dispatch(setMangaChapter(null));
         }
         const chapterObject = { promise: new Promise(async (resolve) => {
@@ -240,6 +235,7 @@ export const fetchChapter = (url) => {
                 dispatch(setMangaChapter(null));
                 resolve(reason);
             };
+            // eslint-disable-next-line no-undef
             const myHeaders = new Headers();
             dispatch(setLoadingState(true, 'imagesInfo'));
             myHeaders.append('Content-Type', 'text/html');
@@ -251,7 +247,7 @@ export const fetchChapter = (url) => {
             const chapterId = respText.match(/chapterid[\s\S]=(.*?);/);
             const content = respText.match(/meta name="og:url" content="(.*?)"/);
             const changedContent = content && content[1].replace('mangafox.me','fanfox.net');
-            innerPromise = recursiveTimeoutFetchChapter({ url, chapterId, changedContent, dispatch });
+            innerPromise = recursiveTimeoutFetchChapter({ url, chapterId, changedContent });
             innerPromise.promise.then((info) => {
                 dispatch(setMangaChapter(null));
                 if (info) {
@@ -273,22 +269,20 @@ export const saveChapterImages = (imagesArray) => {
 
 export const rejectChapterLoad = () => {
     return async (dispatch, getState) => {
-        const { mangaFoxReducer: { chapter } } = getState();
-        if (chapter) {
-            chapter.cancel('Rejected by exit from the chapter reader');
+        const { mangaFoxReducer: { chapterPromise } } = getState();
+        if (chapterPromise) {
+            chapterPromise.cancel('Rejected by exit from the chapter reader');
             dispatch(setMangaChapter(null));
         }
     }; 
 };
 
-const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent, dispatch }) => {
+const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent }) => {
     let timeout;
     let cancel;
     return { promise: new Promise((resolve, reject) => {
-    console.log('in promise');
     let images = [];
     cancel = (reason) => {
-        console.log('in promise cancellation');
         clearTimeout(timeout);
         reject(reason);
     };
@@ -297,7 +291,6 @@ const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent, dispatch
     timeout = () => {
         setTimeout(async () => {
             const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
-            // console.log('timeout for ch', chapterUrl);
             images = await fetchImage({ chapterUrl, url });
             const slicedArray = accumulator.slice(accumulator.length - images.length, accumulator.length);
             const preparedImages = images.reduce((reduce, item) => {
@@ -327,6 +320,7 @@ const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent, dispatch
 
 const fetchImage = ({ url ,chapterUrl }) => {
     return new Promise(async (resolve) => {
+        // eslint-disable-next-line no-undef
         const blobHeaders = new Headers();
         blobHeaders.append('Content-Type', 'text/html');
         blobHeaders.append('Referer', url);

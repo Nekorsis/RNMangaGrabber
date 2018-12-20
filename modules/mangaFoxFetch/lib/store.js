@@ -14,6 +14,6 @@ export const initState = {
     filter: {
         filterUrl: null,
     },
-    chapter: null,
+    chapterPromise: null,
 };
 export default initState;

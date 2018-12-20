@@ -1,8 +1,8 @@
+/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Image,
-    Platform,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -10,26 +10,28 @@ import {
     Button,
     CheckBox,
     ScrollView,
-    TouchableWithoutFeedback,
-    Touchable,
-    TouchableHighlight,
-    Dimensions,
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox } from '../actions';
 import right_arrow from '../../../assets/images/right_arrow.png';
-import { screenNames } from '../config/consts';
+import { screenNames, reducerName } from '../config/consts';
 import Filter from '../lib/Filter'; 
+import styles from '../styles/Main';
 
 class Main extends React.Component {
+    static propTypes = {
+        navigation: PropTypes.shape({}).isRequired,
+        getMangaList: PropTypes.func.isRequired,
+        store: PropTypes.shape({}).isRequired,
+        changeGenreCheckbox: PropTypes.func.isRequired,
+    };
+
     constructor(props) {
         super(props);
         this.filter = new Filter();
-        this.state = { finderIsOpened: false, currentPage: 1 };
+        this.state = { currentPage: 1 };
     }
-
-    keyExtractor = (item, index) => item.name || index.toString();
 
     componentDidMount() {
         const { getMangaList } = this.props;
@@ -37,13 +39,16 @@ class Main extends React.Component {
         this.initializeFilter();
     }
 
+    keyExtractor = (item, index) => item.name || index.toString();
+
     initializeFilter = async () => {
         const { getMangaGenres } = this.props;
         getMangaGenres();
     }
 
     openMangaLink = (manga) => {
-       this.props.navigation.navigate(screenNames.ChaptersList.name, { manga });
+        const { navigation: { navigate } } = this.props;
+        navigate(screenNames.ChaptersList.name, { manga });
     }
 
     // TODO handle next page when searching;
@@ -69,7 +74,7 @@ class Main extends React.Component {
     }
 
     generateGenreCheckboxes = () => {
-        const { mangaGenres } = this.props.store;
+        const { store: { mangaGenres } } = this.props;
         if (mangaGenres === null || mangaGenres === undefined) {
             return;
         }
@@ -84,7 +89,6 @@ class Main extends React.Component {
                       <View key={item.index} style={styles.checkbox}>
                         <CheckBox value={item.isActive} onValueChange={() => this.changeCheckbox(item.index)} />
                         <Text style={styles.checkboxText}>
-                          {/* {item.name && item.name.length < 5 ? item.name : item.name.slice(0, 9)} */}
                           {item.name}
                         </Text>
                       </View>
@@ -95,9 +99,9 @@ class Main extends React.Component {
     }
 
     changeCheckbox = (index) => {
-        const { mangaGenres } = this.props.store;
+        const { store: { mangaGenres }, changeGenreCheckbox } = this.props;
         if (mangaGenres && mangaGenres[index]) {
-            this.props.changeGenreCheckbox(index, !mangaGenres[index].isActive);
+            changeGenreCheckbox(index, !mangaGenres[index].isActive);
             if (mangaGenres[index].isActive) {
                 this.filter.removeGenre(mangaGenres[index]);
             } else {
@@ -106,26 +110,23 @@ class Main extends React.Component {
         }
     }
 
-    //TODO move filter to actions
     onPressStartSearch = () => {
         const { getMangaList } = this.props;
         this.setState({ currentPage: 1 });
-        console.log('completed filter string', this.filter.getFilterString());
         this.filter.setPage(1);
         getMangaList(this.filter.getFilterString());
     }
 
     handleRightArrowPress = () => {
-        console.log('handleRightArrowPress');
         this.scrollView.scrollToEnd();
     }
 
     render() {
-        const { mangaList : { isLoading, list }, mangaGenres } = this.props.store;
+        const { store: { mangaList : { isLoading, list }, mangaGenres } } = this.props;
         return (
           <ScrollView ref={(ref) => this.scrollView = ref} pagingEnabled horizontal style={styles.container}>
             <View style={styles.contentContainer}>
-                {list && (
+              {list && (
                 <FlatList
                   data={list}
                   keyExtractor={this.keyExtractor}
@@ -148,34 +149,34 @@ class Main extends React.Component {
                 }}
                 />
                 )}
-            <TouchableOpacity style={styles.rightButtonTouch} onPress={this.handleRightArrowPress}>
-            <Image
-                source={right_arrow}
-                style={styles.rightButtonImage}
-            />
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.rightButtonTouch} onPress={this.handleRightArrowPress}>
+                <Image
+                  source={right_arrow}
+                  style={styles.rightButtonImage}
+                />
+              </TouchableOpacity>
             </View>
             <View style={styles.innerFinderOpened}>
-                <Button
-                    onPress={isLoading ? () => null : this.onPressPrevPage}
-                    title="Prev Page"
-                    color="#841584"
-                    accessibilityLabel="Learn more about this purple button"
-                />
-                <Button
-                    onPress={isLoading ? () => null : this.onPressNextPage}
-                    title="Next Page"
-                    color="#841584"
-                    accessibilityLabel="Learn more about this purple button"
-                />
-                <Button
-                    style={styles.findButton}
-                    onPress={this.onPressStartSearch}
-                    title="Find"
-                    color="#841584"
-                    accessibilityLabel="Learn more about this purple button"
-                />
-                {mangaGenres && (
+              <Button
+                onPress={isLoading ? () => null : this.onPressPrevPage}
+                title="Prev Page"
+                color="#841584"
+                accessibilityLabel="Learn more about this purple button"
+              />
+              <Button
+                onPress={isLoading ? () => null : this.onPressNextPage}
+                title="Next Page"
+                color="#841584"
+                accessibilityLabel="Learn more about this purple button"
+              />
+              <Button
+                style={styles.findButton}
+                onPress={this.onPressStartSearch}
+                title="Find"
+                color="#841584"
+                accessibilityLabel="Learn more about this purple button"
+              />
+              {mangaGenres && (
                 <View style={styles.checkboxes}>
                     {this.generateGenreCheckboxes()}
                 </View>
@@ -187,7 +188,7 @@ class Main extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    store: state.mangaFoxReducer,
+    store: state[reducerName],
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -197,97 +198,3 @@ const mapDispatchToProps = dispatch => ({
     changeGenreCheckbox: bindActionCreators(setGenreCheckbox, dispatch),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Main);
-
-const { width } = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    developmentModeText: {
-        marginBottom: 20,
-        color: 'rgba(0,0,0,0.4)',
-        fontSize: 14,
-        lineHeight: 19,
-        textAlign: 'center',
-    },
-    contentContainer: {
-        // flex: 0.9,
-        width: width,
-        // paddingTop: 30
-    },
-    findButton: {
-        flex: 0.2,
-    },
-    flatListCheckboxes: {
-        // display: 'flex',
-        // flexDirection: 'row',
-    },
-    checkboxes: {
-        display: 'flex',
-        flex: 1,
-        flexDirection:'row',
-        flexWrap: 'wrap',
-    },
-    checkbox: {
-        marginBottom: 5,
-        marginTop: 5,
-        marginLeft: 5,
-        marginRight: 5,
-        minWidth: 80,
-        display: 'flex',
-        maxWidth: 80,
-        alignItems: 'center',
-        justifyContent: 'center',
-        
-    },
-    checkboxText: {
-        textAlign: 'center',
-    },
-    itemImage: {
-        width: 100,
-        height: 100,
-        // right: '100%',
-    },
-    itemText: {
-        alignSelf: 'flex-end',
-    },
-    itemScore: {
-        position: 'absolute',
-        left: '50%',
-    },
-    rightButtonImage: {
-        width: 50,
-        height: 50,
-    },
-    rightButtonTouch: {
-        position: 'absolute',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        top: '50%',
-        right: 0,
-        width: 50,
-        height: 50,
-    },
-    touchableOpacity: {
-        marginTop: 25,
-        borderBottomColor: 'red',
-        borderBottomWidth: 2,
-        display: 'flex',
-        flexDirection: 'row',
-    },
-    itemTextContainer: {
-        maxWidth: '75%',
-        display: 'flex',
-        flexDirection: 'row',
-    },
-    innerFinderOpened: {
-        backgroundColor: 'lightblue',
-        width: width,
-        display: 'flex',
-        flexDirection: 'column',
-    },
-});

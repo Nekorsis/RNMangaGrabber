@@ -11,10 +11,6 @@ const mangaFoxReducer = (state = initialState, action) => {
     }
     case actionTypes.SET_LOADING_STATE: {
         const { isLoading, name } = action.payload;
-        if (!state[name]) {
-            console.error(`SET_LOADING_STATE, ${name} is not exist in state`);
-            return state;
-        }
         return { ...state, [name] : {...state[name], isLoading } };
     }
     case actionTypes.SET_GENRE_CHECKBOX: {
@@ -33,8 +29,8 @@ const mangaFoxReducer = (state = initialState, action) => {
         }
     }
     case actionTypes.SET_LOADING_CHAPTER: {
-        const { chapter } = action.payload;
-        return { ...state, chapter };
+        const { chapterPromise } = action.payload;
+        return { ...state, chapterPromise };
     }
     case actionTypes.SET_CHAPTERS_LIST: {
         const { mangaChaptersList } = action.payload;
