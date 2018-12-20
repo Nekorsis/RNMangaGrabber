@@ -6,7 +6,6 @@ export default class WebViewScreen extends React.Component {
         return (
         <WebView
         source={{uri: this.props.navigation.state.params.viewUrl}}
-        style={{marginTop: 20}}
       />
     );
     }

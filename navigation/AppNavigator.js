@@ -1,11 +1,16 @@
 
 import { createStackNavigator } from 'react-navigation';
-import HomeScreen from '../screens/HomeScreen';
-import WebViewScreen from '../screens/WebViewScreen';
+import HomeScreen from '../modules/mangaFoxFetch/screens/Main';
+import modules from '../modules';
 
-export default createStackNavigator({
-    Home: {
-        screen: HomeScreen
-    },
-    WebView: { screen: WebViewScreen },
-});
+// creating object with module navigators
+const modulesObject = modules.reduce((accumulator, mod) => {
+    const { screens } = mod;
+    const convertedScreens = screens.reduce((accuScreen, obj) => {
+        accuScreen[obj.name] = { screen: obj.screen };
+        return accuScreen;
+    }, {});
+    return { ...accumulator, ...convertedScreens };
+}, {});
+
+export default createStackNavigator({ Home: { screen: HomeScreen }, ...modulesObject});
