@@ -16,7 +16,7 @@ import { bindActionCreators } from 'redux';
 import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox } from '../actions';
 import right_arrow from '../../../assets/images/right_arrow.png';
 import { screenNames, reducerName } from '../config/consts';
-import Filter from '../lib/Filter'; 
+import Filter from '../lib/filter'; 
 import styles from '../styles/Main';
 
 class Main extends React.Component {
