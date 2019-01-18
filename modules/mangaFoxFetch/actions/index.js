@@ -222,7 +222,7 @@ export const fetchChapter = (url) => {
     return (dispatch, getState) => {
         let cancel;
         let innerPromise;
-        let { mangaFoxReducer: { chapterPromise } } = getState();
+        let { appReducer: { chapterPromise } } = getState();
         if (chapterPromise) {
             chapterPromise.cancel('Rejected by another request');
             dispatch(setMangaChapter(null));
@@ -267,15 +267,15 @@ export const saveChapterImages = (imagesArray) => {
     };
 };
 
-export const rejectChapterLoad = () => {
-    return async (dispatch, getState) => {
-        const { mangaFoxReducer: { chapterPromise } } = getState();
-        if (chapterPromise) {
-            chapterPromise.cancel('Rejected by exit from the chapter reader');
-            dispatch(setMangaChapter(null));
-        }
-    }; 
-};
+// export const rejectChapterLoad = () => {
+//     return async (dispatch, getState) => {
+//         const { mangaFoxReducer: { chapterPromise } } = getState();
+//         if (chapterPromise) {
+//             chapterPromise.cancel('Rejected by exit from the chapter reader');
+//             dispatch(setMangaChapter(null));
+//         }
+//     }; 
+// };
 
 const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent }) => {
     let timeout;
@@ -358,4 +358,14 @@ const fetchImage = ({ url ,chapterUrl }) => {
         };
         reader.readAsText(blob);
     });
+};
+
+export default { 
+    fetchMangaGenresAsync, 
+    fetchMangaListAsync, 
+    searchMangaAsync, 
+    fetchChapter, 
+    deleteMangaChapter,
+    setGenreCheckbox,
+    getMangaChaptersList,
 };

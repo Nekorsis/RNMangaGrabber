@@ -10,8 +10,8 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getMangaChaptersList } from '../actions';
-import { screenNames, reducerName } from '../config/consts';
-import styles from '../styles/ChaptersList';
+import { screenNames } from '../constants/consts';
+import styles from './styles/ChaptersList';
 
 class ChaptersList extends React.Component {
     static propTypes = {
@@ -58,7 +58,7 @@ class ChaptersList extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    store: state[reducerName],
+    store: state.appReducer,
 });
 
 const mapDispatchToProps = dispatch => ({

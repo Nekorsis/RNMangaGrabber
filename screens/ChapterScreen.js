@@ -8,8 +8,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { fetchChapter, setLoadingState, rejectChapterLoad } from '../actions';
-import { reducerName } from '../config/consts';
-import styles from '../styles/Chapter';
+import styles from './styles/Chapter';
 
 class Chapter extends React.Component {
     static propTypes = {
@@ -46,7 +45,7 @@ class Chapter extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    store: state[reducerName],
+    store: state.appReducer,
 });
 
 const mapDispatchToProps = dispatch => ({

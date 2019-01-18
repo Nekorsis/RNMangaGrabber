@@ -1,52 +1,195 @@
+/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Image,
-    Platform,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
     FlatList,
-    Linking,
+    Button,
+    CheckBox,
+    ScrollView,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { MangaStreamUrl } from '../constants/Network';
-import { bindActionCreator } from '../utils/Utils';
-import { fetchMangaDataAsync } from '../actions/actions';
+import { bindActionCreators } from 'redux';
+import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox, changeModuleName } from '../actions';
+import right_arrow from '../assets/images/right_arrow.png';
+import { screenNames } from '../constants/consts';
+import Filter from '../utils/filter'; 
+import styles from './styles/Main';
 
-//const DomParser = require('react-native-html-parser').DOMParser;
+class Main extends React.Component {
+    static propTypes = {
+        navigation: PropTypes.shape({}).isRequired,
+        getMangaList: PropTypes.func.isRequired,
+        store: PropTypes.shape({}).isRequired,
+        changeGenreCheckbox: PropTypes.func.isRequired,
+        changeModule: PropTypes.func.isRequired,
+    };
 
-class HomeScreen extends React.Component {
-    componentDidMount() {
-        this.props.getMangaData(MangaStreamUrl);
+    constructor(props) {
+        super(props);
+        this.filter = new Filter();
+        this.state = { currentPage: 1 };
     }
 
-    openMangaLink = (url) => {
-        this.props.navigation.navigate('WebView', { viewUrl: url });
-        // Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    componentDidMount() {
+        const { getMangaList, navigation: { state: { params: { moduleName = 'mangaFox' } = {} } }, store, changeModule } = this.props;
+        // getting module name from params, used when we will dispatch actions.
+        if(store.moduleName !== moduleName) {
+            this.filter = new Filter();
+            // TODO imptelent
+            changeModule(moduleName);
+            this.moduleName = moduleName;
+        }
+        getMangaList(this.filter.getFilterString(), moduleName);
+        this.initializeGenres();
+    }
+
+    keyExtractor = (item, index) => item.name || index.toString();
+
+    initializeGenres = async () => {
+        const { getMangaGenres } = this.props;
+        getMangaGenres(this.moduleName);
+    }
+
+    openMangaLink = (manga) => {
+        const { navigation: { navigate } } = this.props;
+        navigate(screenNames.ChaptersList.name, { manga, moduleName: this.moduleName });
+    }
+
+    onPressNextPage = async () => {
+        const { currentPage } = this.state;
+        const { getMangaList } = this.props;
+        const nextPage = currentPage + 1;
+        this.setState({ currentPage: nextPage});
+        this.filter.setPage(nextPage);
+        await getMangaList(this.filter.getFilterString(), this.moduleName);
+    }
+
+    onPressPrevPage = async () => {
+        const { currentPage } = this.state;
+        const { getMangaList } = this.props;
+        if(currentPage < 2) {
+            return;
+        }
+        const nextPage = currentPage - 1;
+        this.setState({ currentPage: nextPage });
+        this.filter.setPage(nextPage);
+        await getMangaList(this.filter.getFilterString(), this.moduleName);
+    }
+
+    generateGenreCheckboxes = () => {
+        const { store: { mangaGenres } } = this.props;
+        if (mangaGenres === null || mangaGenres === undefined) {
+            return;
+        }
+        return (
+          <FlatList
+            style={styles.flatListCheckboxes}
+            numColumns={3}
+            data={mangaGenres}
+            keyExtractor={this.keyExtractor}
+            renderItem={({item}) => {
+                    return (
+                      <View key={item.index} style={styles.checkbox}>
+                        <CheckBox value={item.isActive} onValueChange={() => this.changeCheckbox(item.index)} />
+                        <Text style={styles.checkboxText}>
+                          {item.name}
+                        </Text>
+                      </View>
+                    );
+                }}
+          />
+        );
+    }
+
+    changeCheckbox = (index) => {
+        const { store: { mangaGenres }, changeGenreCheckbox } = this.props;
+        if (mangaGenres && mangaGenres[index]) {
+            changeGenreCheckbox(index, !mangaGenres[index].isActive);
+            if (mangaGenres[index].isActive) {
+                this.filter.removeGenre(mangaGenres[index]);
+            } else {
+                this.filter.addGenre(mangaGenres[index]);
+            }
+        }
+    }
+
+    onPressStartSearch = () => {
+        const { getMangaList } = this.props;
+        this.setState({ currentPage: 1 });
+        this.filter.setPage(1);
+        getMangaList(this.filter.getFilterString());
+    }
+
+    handleRightArrowPress = () => {
+        this.scrollView.scrollToEnd();
     }
 
     render() {
-        const { mangaData } = this.props.store;
+        const { store: { mangaList : { isLoading, list }, mangaGenres } } = this.props;
         return (
-            <View style={styles.container}>
-                <View style={styles.welcomeContainer}>
-                    <View style={styles.contentContainer}>
-                        {mangaData && <FlatList
-                            data={mangaData}
-                            renderItem={({item}) => {
-                                return (
-                                    <TouchableOpacity>
-                                        <Text>{item.name}</Text>
-                                        <Text>{item.date}</Text>
-                                        <Text onPress={() => {this.openMangaLink(`${MangaStreamUrl}${item.link}`);}}>{`${MangaStreamUrl}${item.link}`}</Text>
-                                    </TouchableOpacity>
-                                );
-                            }}
-                        />}
-                    </View>   
-                </View>
+          <ScrollView ref={(ref) => this.scrollView = ref} pagingEnabled horizontal style={styles.container}>
+            <View style={styles.contentContainer}>
+              {list && (
+                <FlatList
+                  data={list}
+                  keyExtractor={this.keyExtractor}
+                  renderItem={({item}) => {
+                    if (!item.name) {
+                        return false;
+                    }
+                    return (
+                      <TouchableOpacity onPress={() => { this.openMangaLink(item); }} style={styles.touchableOpacity}>
+                        <Image
+                          style={styles.itemImage}
+                          source={{uri: item.img}}
+                        />
+                        <Text style={styles.itemScore}>{item.itemScore}</Text>
+                        <View style={styles.itemTextContainer}>
+                          <Text style={styles.itemText}>{`${item.name}`}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                }}
+                />
+                )}
+              <TouchableOpacity style={styles.rightButtonTouch} onPress={this.handleRightArrowPress}>
+                <Image
+                  source={right_arrow}
+                  style={styles.rightButtonImage}
+                />
+              </TouchableOpacity>
             </View>
+            <View style={styles.innerFinderOpened}>
+              <Button
+                onPress={isLoading ? () => null : this.onPressPrevPage}
+                title="Prev Page"
+                color="#841584"
+                accessibilityLabel="Learn more about this purple button"
+              />
+              <Button
+                onPress={isLoading ? () => null : this.onPressNextPage}
+                title="Next Page"
+                color="#841584"
+                accessibilityLabel="Learn more about this purple button"
+              />
+              <Button
+                style={styles.findButton}
+                onPress={this.onPressStartSearch}
+                title="Find"
+                color="#841584"
+                accessibilityLabel="Learn more about this purple button"
+              />
+              {mangaGenres && (
+                <View style={styles.checkboxes}>
+                    {this.generateGenreCheckboxes()}
+                </View>
+                )}
+            </View>
+          </ScrollView>
         );
     }
 }
@@ -56,96 +199,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    getMangaData: bindActionCreator(fetchMangaDataAsync, dispatch),
+    getMangaList: bindActionCreators(fetchMangaListAsync, dispatch),
+    getMangaGenres: bindActionCreators(fetchMangaGenresAsync, dispatch),
+    searchManga: bindActionCreators(searchMangaAsync, dispatch),
+    changeGenreCheckbox: bindActionCreators(setGenreCheckbox, dispatch),
+    changeModule: bindActionCreators(changeModuleName, dispatch),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
-
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    developmentModeText: {
-        marginBottom: 20,
-        color: 'rgba(0,0,0,0.4)',
-        fontSize: 14,
-        lineHeight: 19,
-        textAlign: 'center',
-    },
-    contentContainer: {
-        paddingTop: 30,
-    },
-    welcomeContainer: {
-        alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 20,
-    },
-    welcomeImage: {
-        width: 100,
-        height: 80,
-        resizeMode: 'contain',
-        marginTop: 3,
-        marginLeft: -10,
-    },
-    getStartedContainer: {
-        alignItems: 'center',
-        marginHorizontal: 50,
-    },
-    homeScreenFilename: {
-        marginVertical: 7,
-    },
-    codeHighlightText: {
-        color: 'rgba(96,100,109, 0.8)',
-    },
-    codeHighlightContainer: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        borderRadius: 3,
-        paddingHorizontal: 4,
-    },
-    getStartedText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        lineHeight: 24,
-        textAlign: 'center',
-    },
-    tabBarInfoContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        ...Platform.select({
-            ios: {
-                shadowColor: 'black',
-                shadowOffset: { height: -3 },
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
-            },
-            android: {
-                elevation: 20,
-            },
-        }),
-        alignItems: 'center',
-        backgroundColor: '#fbfbfb',
-        paddingVertical: 20,
-    },
-    tabBarInfoText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        textAlign: 'center',
-    },
-    navigationFilename: {
-        marginTop: 5,
-    },
-    helpContainer: {
-        marginTop: 15,
-        alignItems: 'center',
-    },
-    helpLink: {
-        paddingVertical: 15,
-    },
-    helpLinkText: {
-        fontSize: 14,
-        color: '#2e78b7',
-    },
-});
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
