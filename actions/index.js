@@ -168,7 +168,7 @@ export const saveChapterImages = (imagesArray) => {
 
 export const rejectChapterLoad = () => {
     return (dispatch, getState) => {
-        const { mangaFoxReducer: { chapterPromise } } = getState();
+        const { appReducer: { chapterPromise } } = getState();
         if (chapterPromise) {
             chapterPromise.cancel('Rejected by exit from the chapter reader');
             dispatch(setMangaChapter(null));

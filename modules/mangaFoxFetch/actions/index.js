@@ -244,6 +244,7 @@ export const fetchChapter = (url) => {
                 method: 'get',
                 headers: myHeaders
             })).text();
+            
             const chapterId = respText.match(/chapterid[\s\S]=(.*?);/);
             const content = respText.match(/meta name="og:url" content="(.*?)"/);
             const changedContent = content && content[1].replace('mangafox.me','fanfox.net');
@@ -291,7 +292,7 @@ const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent }) => {
     timeout = () => {
         setTimeout(async () => {
             const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
-            images = await fetchImage({ chapterUrl, url });
+            images = await fetchImage({ url, chapterUrl });
             const slicedArray = accumulator.slice(accumulator.length - images.length, accumulator.length);
             const preparedImages = images.reduce((reduce, item) => {
                 if (slicedArray.some((someItem) => item.url === someItem.url)) {
@@ -318,7 +319,7 @@ const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent }) => {
 }), cancel };
 };
 
-const fetchImage = ({ url ,chapterUrl }) => {
+const fetchImage = ({ url, chapterUrl }) => {
     return new Promise(async (resolve) => {
         // eslint-disable-next-line no-undef
         const blobHeaders = new Headers();
@@ -326,7 +327,7 @@ const fetchImage = ({ url ,chapterUrl }) => {
         blobHeaders.append('Referer', url);
         let blobResp = await fetch(chapterUrl, {
             mode: 'no-cors',
-            method: 'get',
+            method: 'GET',
             headers: blobHeaders,
         });
         if (blobResp._bodyBlob._data.size <= 0) {
@@ -337,7 +338,7 @@ const fetchImage = ({ url ,chapterUrl }) => {
                 interval = setInterval(async () => {
                     blobResponse = await fetch(chapterUrl, {
                         mode: 'no-cors',
-                        method: 'get',
+                        method: 'GET',
                         headers: blobHeaders,
                     });
                     repeatCounter += 1 ;
@@ -349,14 +350,15 @@ const fetchImage = ({ url ,chapterUrl }) => {
             });
             clearInterval(interval);
         }
-        const blob = await blobResp.blob();
-        var reader = new FileReader();
-        reader.onload = function() {
-            const ev = eval(reader.result);
-            const img = 'http:' + ev[0];
-            ev[1] ? resolve([{ url: img }, { url: ev[1] }]) : resolve([{ url: img }]);
-        };
-        reader.readAsText(blob);
+        const text = await blobResp.text();
+        var d;
+        eval(text);
+        const regex = /http:.*/;
+        const fixedImgArray = d.map((imgsrc) => {
+            return { url: imgsrc.match(regex) ? imgsrc : 'http:' + imgsrc };
+
+        });
+        resolve(fixedImgArray);
     });
 };
 
