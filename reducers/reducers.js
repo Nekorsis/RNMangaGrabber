@@ -4,13 +4,14 @@ import { initState as initialState } from '../store';
 import AppNavigator from '../navigation/AppNavigator';
 import { actionTypes } from '../actions';
 
-import modules from '../modules';
+// import modules from '../modules';
 
 // creating object with module navigators
-const modulesReducersObj = modules.reduce((accumulator, mod) => {
-    const { reducer, reducerName, moduleName } = mod;
-    return { ...accumulator, [reducerName || `${moduleName}Reducer`]: reducer };
-}, {});
+// currently isn't in use
+// const modulesReducersObj = modules.reduce((accumulator, mod) => {
+//     const { reducer, reducerName, moduleName } = mod;
+//     return { ...accumulator, [reducerName || `${moduleName}Reducer`]: reducer };
+// }, {});
 
 const initialNavigatorState = AppNavigator.router.getStateForAction(NavigationActions.init());
 

@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
     View,
+    ActivityIndicator,
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { connect } from 'react-redux';
@@ -25,7 +26,7 @@ class Chapter extends React.Component {
     }
 
     componentWillUnmount() {
-        const { changeLoadingState, rejectChapterLoad } =  this.props;
+        const { changeLoadingState, rejectChapterLoad } = this.props;
         changeLoadingState(true, 'imagesInfo');
         rejectChapterLoad();
     }
@@ -36,8 +37,9 @@ class Chapter extends React.Component {
         const { store: { imagesInfo: { isLoading, imagesArray } } } = this.props;
         return (
           <View style={styles.container}>
-            {!isLoading &&
-              <ImageViewer imageUrls={imagesArray} />
+            {isLoading ? 
+              <ActivityIndicator size="large" color="#0000ff" />
+              : <ImageViewer imageUrls={imagesArray} />
             }
           </View>
         );

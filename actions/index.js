@@ -12,35 +12,35 @@ export const actionTypes = {
     SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
 };
 
+const funcNames = { 
+    fetchMangaGenresAsync: 'fetchMangaGenresAsync',
+    fetchMangaListAsync: 'fetchMangaListAsync',
+    searchMangaAsync: 'searchMangaAsync',
+    getMangaChaptersList: 'getMangaChaptersList',
+    fetchChapter: 'fetchChapter',
+};
+
 // getting all of the module actions.
 const modulesReducersActions = modules.reduce((accumulator, mod) => {
     const { moduleName, actions } = mod;
     return { ...accumulator, [moduleName]: actions };
 }, {});
 
-const funcCaller = (funcName, moduleName, name, dispatch, ...extra) => {
-
+const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
+    let { appReducer: { moduleName } } = getState();
     if (!(name || moduleName)) {
-        console.log('need to run default parser funcCaller');
+        console.log('need to run default parser funcCaller for func: ' + funcName);
         return;
     }
-    return name ?  modulesReducersActions[name][funcName](extra)(dispatch) :
-          modulesReducersActions[moduleName][funcName](extra)(dispatch);
+    return name ?  modulesReducersActions[name][funcName](...extra)(dispatch, getState) :
+          modulesReducersActions[moduleName][funcName](...extra)(dispatch, getState);
 };
 
 export const fetchMangaGenresAsync = (name) => {
     return function(dispatch, getState) {
-        let { appReducer: { moduleName } } = getState();
-
-        if (!(name || moduleName)) {
-            console.log('need to run default parser');
-            return;
-        }
-
-        return name ?  modulesReducersActions[name].fetchMangaGenresAsync()(dispatch) :
-          modulesReducersActions[moduleName].fetchMangaGenresAsync()(dispatch);
+        return funcCaller(funcNames.fetchMangaGenresAsync, getState, name, dispatch);
     };
-};
+}
 
 export const changeModuleName = (moduleName) => {
     return {
@@ -51,15 +51,7 @@ export const changeModuleName = (moduleName) => {
 
 export const fetchMangaListAsync = (url, name) => {
     return (dispatch, getState) => {
-        let { appReducer: { moduleName } } = getState();
-
-        if (!(name || moduleName)) {
-            console.log('need to run default parser');
-            return;
-        }
-
-        return name ?  modulesReducersActions[name].fetchMangaListAsync(url)(dispatch) :
-          modulesReducersActions[moduleName].fetchMangaListAsync(url)(dispatch);
+        return funcCaller(funcNames.fetchMangaListAsync, getState, name, dispatch, url);
     };
 };
 
@@ -80,31 +72,13 @@ export const setMangaGenres = (mangaGenres) => {
 
 export const searchMangaAsync = (filter, name) => {
     return (dispatch, getState) => {
-        let { appReducer: { moduleName } } = getState();
-
-        if (!(name || moduleName)) {
-            console.log('need to run default parser');
-            return;
-        }
-
-        return name ?  modulesReducersActions[name].searchMangaAsync(filter)(dispatch) :
-          modulesReducersActions[moduleName].searchMangaAsync(filter)(dispatch);
+        return funcCaller(funcNames.searchMangaAsync, getState, name, dispatch, filter);
     };
 };
 
 export const getMangaChaptersList = (url, name) => {
     return (dispatch, getState) => {
-        let { appReducer: { moduleName } } = getState();
-
-        if (!(name || moduleName)) {
-            console.log('need to run default parser');
-            return;
-        }
-
-        console.log(name || moduleName);
-
-        return name ?  modulesReducersActions[name].getMangaChaptersList(url)(dispatch) :
-          modulesReducersActions[moduleName].getMangaChaptersList(url)(dispatch);
+        return funcCaller(funcNames.getMangaChaptersList, getState, name, dispatch, url);
     };
 };
 
@@ -147,15 +121,7 @@ export const deleteMangaChapter = (chapterPromise) => {
 
 export const fetchChapter = (url, name) => {
     return (dispatch, getState) => {
-        let { appReducer: { moduleName } } = getState();
-
-        if (!(name || moduleName)) {
-            console.log('need to run default parser');
-            return;
-        }
-
-        return name ?  modulesReducersActions[name].fetchChapter(url)(dispatch, getState) :
-          modulesReducersActions[moduleName].fetchChapter(url)(dispatch, getState);
+        return funcCaller(funcNames.fetchChapter, getState, name, dispatch, url);
     };
 };
 

@@ -3,7 +3,7 @@ import { createStackNavigator } from 'react-navigation';
 import HomeScreen from '../screens/HomeScreen';
 import ChaptersListScreen from '../screens/ChaptersListScreen';
 import ChapterScreen from '../screens/ChapterScreen';
-// import modules from '../modules';
+import SiteScreen from '../screens/SiteScreen';
 
 // creating object with module navigators
 // const modulesObject = modules.reduce((accumulator, mod) => {
@@ -15,4 +15,4 @@ import ChapterScreen from '../screens/ChapterScreen';
 //     return { ...accumulator, ...convertedScreens };
 // }, {});
 
-export default createStackNavigator({ Home: { screen: HomeScreen }, ChaptersList: { screen: ChaptersListScreen }, Chapter: { screen: ChapterScreen } });
+export default createStackNavigator({ Home: { screen: HomeScreen }, ChaptersList: { screen: ChaptersListScreen }, Chapter: { screen: ChapterScreen }, Site: { screen: SiteScreen } });
