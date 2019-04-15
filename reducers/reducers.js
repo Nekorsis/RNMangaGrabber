@@ -58,6 +58,10 @@ const appReducer = (state = initialState, action) => {
             const { imagesArray } = action.payload;
             return { ...state, imagesInfo: { ...state.imagesInfo, imagesArray, isLoading: false } };
         }
+        case actionTypes.SET_HOT_CATEGORY: {
+            const { moduleName, hotInfo } = action.payload;
+            return { ...state, hotCategories: { ...state.hotCategories, [moduleName]: hotInfo } };
+        }
         default:
             break;
         }

@@ -6,48 +6,59 @@ import {
     Text,
     TouchableOpacity,
     View,
-    FlatList,
-    Button,
-    CheckBox,
     ScrollView,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { changeModuleName } from '../actions';
+// need to import actions or the app will crush /?/
+import '../actions';
 import { screenNames } from '../constants/consts';
-import styles from './styles/Main';
+import styles from './styles/Home';
+import HotRelease from '../components/HotRelease';
 import siteNames from '../utils/sitenames';
 import siteImages from '../assets/images/siteimages';
 
 class Home extends React.Component {
+    state = { enabled: true };
+
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
         store: PropTypes.shape({}).isRequired,
     };
+
+    setScrolling = (enabled) => this.setState({ enabled });
     
     openMangaSite = (link) => {
         const { navigation: { navigate } } = this.props;
         navigate(screenNames.Site.name, { moduleName: link });
     }
 
-    createSiteLinks = (sites) => {
-        return sites.map((link, index) => {
+
+    createSiteLinks = () => {
+        return siteNames.map((link, index) => {
             return (
-                <View key={index}>
+              // eslint-disable-next-line react/no-array-index-key
+              <View style={styles.siteContainer} key={index}>
                 <TouchableOpacity onPress={() => { this.openMangaSite(link); }} style={styles.touchableOpacity}>
-                    <Image style={{ backgroundColor: 'red' }} source={siteImages[link]}/>
-                    <Text> {link} </Text>
+                  <Image style={styles.siteImage} source={siteImages[link]} />
+                  <Text> 
+                    {' '}
+                    {link}
+                    {' '}
+                  </Text>
                 </TouchableOpacity>
+                <View>
+                  <HotRelease moduleName={link} setScrolling={this.setScrolling} />
                 </View>
+              </View>
             );
         });
-
     }
 
     render() {
+      const { enabled } = this.state;
         return (
-          <ScrollView style={styles.container}>
-          {this.createSiteLinks(siteNames)}
+          <ScrollView scrollEnabled={enabled} horizontal style={styles.container}>
+            {this.createSiteLinks()}
           </ScrollView>
         );
     }

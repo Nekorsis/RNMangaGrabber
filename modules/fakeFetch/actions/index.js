@@ -1,4 +1,4 @@
-import { mangaPath, searchPath, hotPath } from '../config/Network';
+import { mangaPath, searchPath } from '../config/Network';
 import { repeatMaxCounter } from '../config/consts';
 import { 
     setMangaGenres, 
@@ -6,50 +6,18 @@ import {
     setMangaList, 
     saveChapterImages, 
     setMangaChapter, 
-    setMangaChaptersList,
-    setHotCategory,
+    setMangaChaptersList, 
 } from '../../../actions';
 
-const imgSrcRegex = /img.+?src="(.+?)".+?<\/a>/;
-const nameRegex = /title="(.*?)"><img\s/;
-const linkRegex = /<a href="\/manga\/(.+?)\/"/;
-const itemScoreRegex = /<span class="item-score">(\d+\.\d+)<\/span>/;
 
-export const fetchHotCategoryAsync = (moduleName) => {
-    return async function(dispatch) {
-        // eslint-disable-next-line no-undef
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'text/html');
-        try {
-            const response = await fetch(hotPath, {
-                mode: 'no-cors',
-                method: 'get',
-                headers: myHeaders
-            });
-            const textifiedResponse = await response.text();
-            const hotBlock = textifiedResponse.split('<li').reduce((accumulator, value) => {
-                const imgsrc = value.match(imgSrcRegex);
-                const name = value.match(nameRegex);
-                const link = value.match(linkRegex);
-                const itemScore = value.match(itemScoreRegex);
-                if (!imgsrc || !name ) {
-                    return accumulator;
-                }
-                const block = { 
-                    img: imgsrc && imgsrc[1],
-                    name: name && name[1],
-                    link: link && mangaPath + link[1], 
-                    itemScore: itemScore && itemScore[1] 
-                };
-                accumulator = [...accumulator, block];
-                return accumulator;
-            }, []);
-            dispatch(setHotCategory(moduleName, hotBlock));
-        }
-        catch (err) {
-            console.log(err);
-        }
-    };
+export const actionTypes = {
+    SET_MANGA_LIST: 'SET_MANGA_LIST',
+    SET_MANGA_GENRES: 'SET_MANGA_GENRES',
+    SET_GENRE_CHECKBOX: 'SET_GENRE_CHECKBOX',
+    SET_CHAPTERS_LIST: 'SET_CHAPTERS_LIST',
+    SET_LOADING_STATE: 'SET_LOADING_STATE',
+    SAVE_CHAPTER_IMAGES: 'SAVE_CHAPTER_IMAGES',
+    SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
 };
 
 export const fetchMangaGenresAsync = (callback) => {
@@ -348,7 +316,6 @@ const fetchImage = ({ url, chapterUrl }) => {
 export default { 
     fetchMangaGenresAsync, 
     fetchMangaListAsync, 
-    fetchHotCategoryAsync,
     searchMangaAsync, 
     fetchChapter, 
     getMangaChaptersList,

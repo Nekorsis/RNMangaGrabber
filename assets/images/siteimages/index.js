@@ -1,2 +1,4 @@
 import mangaFox from './mangaFox.png';
-export default { mangaFox };
+import fake from './fake.png';
+
+export default { mangaFox, fake };

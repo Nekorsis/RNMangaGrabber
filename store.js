@@ -16,5 +16,6 @@ export const initState = {
     },
     chapterPromise: null,
     moduleName: null,
+    hotCategories: {},
 };
 export default initState;

@@ -10,6 +10,7 @@ export const actionTypes = {
     SAVE_CHAPTER_IMAGES: 'SAVE_CHAPTER_IMAGES',
     CHANGE_MODULE_NAME: 'CHANGE_MODULE_NAME',
     SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
+    SET_HOT_CATEGORY: 'SET_HOT_CATEGORY',
 };
 
 const funcNames = { 
@@ -18,6 +19,7 @@ const funcNames = {
     searchMangaAsync: 'searchMangaAsync',
     getMangaChaptersList: 'getMangaChaptersList',
     fetchChapter: 'fetchChapter',
+    fetchHotCategoryAsync: 'fetchHotCategoryAsync',
 };
 
 // getting all of the module actions.
@@ -27,7 +29,11 @@ const modulesReducersActions = modules.reduce((accumulator, mod) => {
 }, {});
 
 const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
-    let { appReducer: { moduleName } } = getState();
+    // TODO simplify
+    let moduleName;
+    if(!name) {
+        moduleName = getState().appReducer.moduleName;
+    }
     if (!(name || moduleName)) {
         console.log('need to run default parser funcCaller for func: ' + funcName);
         return;
@@ -40,7 +46,20 @@ export const fetchMangaGenresAsync = (name) => {
     return function(dispatch, getState) {
         return funcCaller(funcNames.fetchMangaGenresAsync, getState, name, dispatch);
     };
-}
+};
+
+export const fetchHotCategoryAsync = (name) => {
+    return function(dispatch, getState) {
+        return funcCaller(funcNames.fetchHotCategoryAsync, getState, name, dispatch, name);
+    };
+};
+
+export const setHotCategory = (moduleName, hotInfo) => {
+    return {
+        type: actionTypes.SET_HOT_CATEGORY,
+        payload: { moduleName, hotInfo },
+    };
+};
 
 export const changeModuleName = (moduleName) => {
     return {
