@@ -13,12 +13,15 @@ import { connect } from 'react-redux';
 import '../actions';
 import { screenNames } from '../constants/consts';
 import styles from './styles/Home';
+import vars from './styles/vars';
 import HotRelease from '../components/HotRelease';
 import siteNames from '../utils/sitenames';
 import siteImages from '../assets/images/siteimages';
 
+const width = vars.width / 3;
+
 class Home extends React.Component {
-    state = { enabled: true };
+    state = { enabled: true, currentPage: 0 };
 
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
@@ -39,25 +42,33 @@ class Home extends React.Component {
               // eslint-disable-next-line react/no-array-index-key
               <View style={styles.siteContainer} key={index}>
                 <TouchableOpacity onPress={() => { this.openMangaSite(link); }} style={styles.touchableOpacity}>
-                  <Image style={styles.siteImage} source={siteImages[link]} />
-                  <Text> 
-                    {' '}
-                    {link}
-                    {' '}
+                  <Text style={styles.blockName}>
+                    {link.toUpperCase()}
                   </Text>
                 </TouchableOpacity>
-                <View>
+                <View style={styles.hotRelease}>
                   <HotRelease moduleName={link} setScrolling={this.setScrolling} />
                 </View>
+                {/* <View style={styles.hotRelease}>
+                  <HotRelease moduleName={link} setScrolling={this.setScrolling} />
+                </View> */}
               </View>
             );
         });
     }
 
+     onScrollEndDrag = ({ nativeEvent }) => { 
+    }
+
     render() {
       const { enabled } = this.state;
         return (
-          <ScrollView scrollEnabled={enabled} horizontal style={styles.container}>
+          <ScrollView 
+            scrollEnabled={enabled} 
+            horizontal 
+            style={styles.container}
+            onScrollEndDrag={this.onScrollEndDrag}
+          >
             {this.createSiteLinks()}
           </ScrollView>
         );

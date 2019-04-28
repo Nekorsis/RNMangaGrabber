@@ -29,13 +29,18 @@ const modulesReducersActions = modules.reduce((accumulator, mod) => {
 }, {});
 
 const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
-    // TODO simplify
     let moduleName;
+    // TODO simplify
     if(!name) {
         moduleName = getState().appReducer.moduleName;
     }
     if (!(name || moduleName)) {
         console.log('need to run default parser funcCaller for func: ' + funcName);
+        return;
+    }
+    if (!(modulesReducersActions[name] || modulesReducersActions[moduleName])) {
+        console.log('missing module: ' + name);
+        console.log('function name: ' + funcName);
         return;
     }
     return name ?  modulesReducersActions[name][funcName](...extra)(dispatch, getState) :

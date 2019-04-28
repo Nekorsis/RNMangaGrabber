@@ -36,13 +36,15 @@ class Main extends React.Component {
 
     componentDidMount() {
         const { getMangaList, navigation: { state: { params: { moduleName } = {} } }, store, changeModule } = this.props;
+        this.moduleName = moduleName;
         // getting module name from params, used when we will dispatch actions.
         if(store.moduleName !== moduleName) {
             changeModule(moduleName);
-            this.moduleName = moduleName;
+            getMangaList(this.filter.getFilterString(), moduleName);
+            this.initializeGenres();
         }
-        getMangaList(this.filter.getFilterString(), moduleName);
-        this.initializeGenres();
+        // getMangaList(this.filter.getFilterString(), moduleName);
+        // this.initializeGenres();
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
