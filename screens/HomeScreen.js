@@ -37,6 +37,7 @@ class Home extends React.Component {
 
 
     createSiteLinks = () => {
+      const { navigation } = this.props;
         return siteNames.map((link, index) => {
             return (
               // eslint-disable-next-line react/no-array-index-key
@@ -47,7 +48,7 @@ class Home extends React.Component {
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.hotRelease}>
-                  <HotRelease moduleName={link} setScrolling={this.setScrolling} />
+                  <HotRelease moduleName={link} setScrolling={this.setScrolling} navigation={navigation} />
                 </View>
                 {/* <View style={styles.hotRelease}>
                   <HotRelease moduleName={link} setScrolling={this.setScrolling} />
@@ -65,7 +66,8 @@ class Home extends React.Component {
         return (
           <ScrollView 
             scrollEnabled={enabled} 
-            horizontal 
+            horizontal
+            pagingEnabled
             style={styles.container}
             onScrollEndDrag={this.onScrollEndDrag}
           >

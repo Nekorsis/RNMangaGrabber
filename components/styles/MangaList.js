@@ -18,15 +18,18 @@ export default StyleSheet.create({
         borderRadius: 5,
         borderWidth: 2,
         borderColor: 'blue',
+        maxHeight: '35%',
         // backgroundColor: 'red',
         // width: vars.width ,
     },
     itemImage: {
-        width: 200,
-        height: 200,
+        width: 150,
+        height: 150,
     },
     itemText: {
-        alignSelf: 'flex-end',
+        textAlign: 'center',
+        width: 150,
+
     },
     itemScore: {
         position: 'absolute',
@@ -35,18 +38,23 @@ export default StyleSheet.create({
     touchableOpacity: {
         // marginTop: 25,
         flex: 1,
+        // maxWidth: 250,
         marginRight: 10,
         borderRightColor: vars.red,
+        borderLeftColor: vars.green,
+        borderLeftWidth: 2,
         borderRightWidth: 2,
+        alignItems: 'center',
+        // justifyContent: 'center',
     },
     blockName: {
         fontWeight: 'bold',
         fontSize: 25,
         fontStyle: 'italic',
     },
-    itemTextContainer: {
-        maxWidth: '75%',
-        display: 'flex',
-        flexDirection: 'row',
-    },
+    // itemTextContainer: {
+    //     maxWidth: '80%',
+    //     display: 'flex',
+    //     flexDirection: 'row',
+    // },
 });

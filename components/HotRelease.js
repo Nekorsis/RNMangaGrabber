@@ -33,11 +33,11 @@ class HotRelease extends React.Component {
   }
 
   render() {
-    const { moduleName, store, setScrolling } = this.props;
+    const { moduleName, store, setScrolling, navigation } = this.props;
     const { hotCategories: { [moduleName]: hotInfo } = {} } = store;
 
     return (
-      <MangaListBlock blockName="Hot Releases" list={hotInfo} setScrolling={setScrolling} />
+      <MangaListBlock blockName="Hot Releases" list={hotInfo} setScrolling={setScrolling} navigation={navigation} moduleName={moduleName} />
     );
   }
 } 

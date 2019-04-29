@@ -8,15 +8,33 @@ import {
     ScrollView,
     ActivityIndicator,
 } from 'react-native';
+import PropTypes from 'prop-types';
+
+
 import styles from './styles/MangaList';
+import { screenNames } from '../constants/consts';
 
 
 class MangaList extends React.Component {
+  static propTypes = {
+    navigation: PropTypes.shape({}).isRequired,
+    moduleName: PropTypes.string.isRequired,
+    list: PropTypes.shape({}),
+    setScrolling: PropTypes.func.isRequired,
+    blockName: PropTypes.string.isRequired,
+};
+
   keyExtractor = (item, index) => item.name || index.toString();
+
+  touchableOpacityOnPress = (item) => () => this.openMangaLink(item);
+
+  openMangaLink = (manga) => {
+    const { navigation: { navigate }, moduleName } = this.props;
+    navigate(screenNames.ChaptersList.name, { manga, moduleName });
+}
 
   render() {
     const { list, setScrolling, blockName } = this.props;
-    console.log(list && list[list.length -1]);
     return (
       list ? (
         <Fragment>
@@ -38,12 +56,11 @@ class MangaList extends React.Component {
           >
             {list.map((item, index) => {
                         return (
-                          <TouchableOpacity style={styles.touchableOpacity} key={this.keyExtractor(item.name, index)}>
+                          <TouchableOpacity onPress={this.touchableOpacityOnPress(item)} style={styles.touchableOpacity} key={this.keyExtractor(item.name, index)}>
                             <Image
                               style={styles.itemImage}
                               source={{uri: item.img}}
                             />
-                            <Text style={styles.itemScore}>{item.itemScore}</Text>
                             <View style={styles.itemTextContainer}>
                               <Text style={styles.itemText}>{`${item.name}`}</Text>
                             </View>
@@ -58,5 +75,5 @@ class MangaList extends React.Component {
   }
 }
 
-
 export default MangaList;
+

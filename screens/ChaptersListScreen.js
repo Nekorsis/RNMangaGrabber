@@ -21,9 +21,9 @@ class ChaptersList extends React.Component {
     };
 
     componentDidMount() {
-        const { navigation: { state: { params: { manga } = {} } }, getMangaChaptersList } =  this.props;
+        const { navigation: { state: { params: { manga, moduleName } = {} } }, getMangaChaptersList } =  this.props;
         if (manga) {
-            getMangaChaptersList(manga.link);
+            getMangaChaptersList(manga.link, moduleName);
         }
     }
 

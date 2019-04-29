@@ -29,22 +29,26 @@ const modulesReducersActions = modules.reduce((accumulator, mod) => {
 }, {});
 
 const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
-    let moduleName;
+    const moduleName = name || getState().appReducer.moduleName;
     // TODO simplify
-    if(!name) {
-        moduleName = getState().appReducer.moduleName;
-    }
     if (!(name || moduleName)) {
         console.log('need to run default parser funcCaller for func: ' + funcName);
         return;
     }
-    if (!(modulesReducersActions[name] || modulesReducersActions[moduleName])) {
+
+    const moduleBlock = modulesReducersActions[moduleName];
+    if (!moduleBlock) {
         console.log('missing module: ' + name);
-        console.log('function name: ' + funcName);
         return;
     }
-    return name ?  modulesReducersActions[name][funcName](...extra)(dispatch, getState) :
-          modulesReducersActions[moduleName][funcName](...extra)(dispatch, getState);
+
+    const func = moduleBlock[funcName];
+    if (!func) {
+        console.log('missing func: ' + funcName);
+        return;
+    }
+
+    return func(...extra)(dispatch, getState);
 };
 
 export const fetchMangaGenresAsync = (name) => {

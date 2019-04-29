@@ -2,6 +2,6 @@
 import mangaFox from './mangaFoxFetch/index';
 import fakeFox from './fakeFetch/index';
 
-const array = [ mangaFox ];
+const array = [ mangaFox, mangaFox ];
 
 export default array;
