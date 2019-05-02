@@ -21,12 +21,13 @@ class Chapter extends React.Component {
     };
 
     componentDidMount() {
-        const { navigation: { state: { params: { chapter } = {} } }, fetchChapter } =  this.props;
-        fetchChapter(chapter.link);
+        const { navigation: { state: { params: { chapter, moduleName } = {} } }, fetchChapter } =  this.props;
+        fetchChapter(chapter.link, moduleName);
     }
 
     componentWillUnmount() {
         const { changeLoadingState, rejectChapterLoad } = this.props;
+        console.log('Chapter unmount');
         changeLoadingState(true, 'imagesInfo');
         rejectChapterLoad();
     }

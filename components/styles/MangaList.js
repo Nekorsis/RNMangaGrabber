@@ -15,12 +15,11 @@ export default StyleSheet.create({
     },
     flatList: {
         marginTop: 10,
-        borderRadius: 5,
-        borderWidth: 2,
+        borderRadius: 8,
         borderColor: 'blue',
         maxHeight: '35%',
-        // backgroundColor: 'red',
-        // width: vars.width ,
+        marginHorizontal: 1,
+        borderStyle: 'solid',
     },
     itemImage: {
         width: 150,
@@ -36,25 +35,18 @@ export default StyleSheet.create({
         left: '50%',
     },
     touchableOpacity: {
-        // marginTop: 25,
         flex: 1,
-        // maxWidth: 250,
         marginRight: 10,
         borderRightColor: vars.red,
         borderLeftColor: vars.green,
         borderLeftWidth: 2,
         borderRightWidth: 2,
         alignItems: 'center',
-        // justifyContent: 'center',
+        borderRadius: (5),
     },
     blockName: {
         fontWeight: 'bold',
         fontSize: 25,
         fontStyle: 'italic',
     },
-    // itemTextContainer: {
-    //     maxWidth: '80%',
-    //     display: 'flex',
-    //     flexDirection: 'row',
-    // },
 });

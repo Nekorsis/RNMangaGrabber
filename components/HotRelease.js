@@ -7,37 +7,28 @@ import { bindActionCreators } from 'redux';
 import { fetchHotCategoryAsync } from '../actions';
 import MangaListBlock from './MangaListBlock';
 
-// const HotRelease = ({ moduleName, store }) => {
-
-//   const { hotCategories: { [moduleName]: hotInfo } = {} } = store;
-
-//   console.log(hotInfo);
-
-//   useEffect(() => {
-//     getHotCategory(moduleName);
-//   });
-
-//   return (
-//   <ScrollView pagingEnabled style={styles.container}>
-
-//   </ScrollView>
-//   )
-
-// }
+const BLOCK_NAME = 'Hot Releases';
 
 class HotRelease extends React.Component {
   componentDidMount() {
-    const { moduleName, getHotCategory,  } = this.props;
+    const { moduleName, getHotCategory } = this.props;
     
     getHotCategory(moduleName);
   }
 
   render() {
-    const { moduleName, store, setScrolling, navigation } = this.props;
+    const { moduleName, store, ...extra } = this.props;
     const { hotCategories: { [moduleName]: hotInfo } = {} } = store;
 
     return (
-      <MangaListBlock blockName="Hot Releases" list={hotInfo} setScrolling={setScrolling} navigation={navigation} moduleName={moduleName} />
+      <MangaListBlock 
+        blockName={BLOCK_NAME} 
+        list={hotInfo} 
+        // setScrolling={setScrolling} 
+        moduleName={moduleName}
+        {...extra}
+        // openMangaLink={openMangaLink}
+      />
     );
   }
 } 
@@ -47,6 +38,8 @@ HotRelease.propTypes = {
   moduleName: PropTypes.string.isRequired,
   getHotCategory: PropTypes.func.isRequired,
   setScrolling: PropTypes.func.isRequired,
+  // navigation: PropTypes.shape({}).isRequired,
+  openMangaLink: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({

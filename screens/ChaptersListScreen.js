@@ -28,8 +28,8 @@ class ChaptersList extends React.Component {
     }
 
     openChapter = (chapter) => {
-        const { navigation: { navigate } } =  this.props;
-        navigate(screenNames.Chapter.name, { chapter });
+        const { navigation: { navigate, state: { params: { moduleName } = {} } } } =  this.props;
+        navigate(screenNames.Chapter.name, { chapter, moduleName });
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
