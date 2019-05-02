@@ -8,7 +8,7 @@ import {
     setMangaChapter, 
     setMangaChaptersList,
     setHotCategory,
-} from '../../../actions';
+} from '../../../actions/common';
 
 const imgSrcRegex = /img.+?src="(.+?)".+?<\/a>/;
 const nameRegex = /title="(.*?)"><img\s/;

@@ -24,10 +24,8 @@ class HotRelease extends React.Component {
       <MangaListBlock 
         blockName={BLOCK_NAME} 
         list={hotInfo} 
-        // setScrolling={setScrolling} 
         moduleName={moduleName}
         {...extra}
-        // openMangaLink={openMangaLink}
       />
     );
   }
@@ -37,8 +35,6 @@ HotRelease.propTypes = {
   store: PropTypes.shape({}).isRequired,
   moduleName: PropTypes.string.isRequired,
   getHotCategory: PropTypes.func.isRequired,
-  setScrolling: PropTypes.func.isRequired,
-  // navigation: PropTypes.shape({}).isRequired,
   openMangaLink: PropTypes.func.isRequired,
 };
 
