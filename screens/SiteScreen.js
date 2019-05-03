@@ -36,13 +36,15 @@ class Main extends React.Component {
 
     componentDidMount() {
         const { getMangaList, navigation: { state: { params: { moduleName } = {} } }, store, changeModule } = this.props;
+        this.moduleName = moduleName;
         // getting module name from params, used when we will dispatch actions.
         if(store.moduleName !== moduleName) {
             changeModule(moduleName);
-            this.moduleName = moduleName;
+            getMangaList(this.filter.getFilterString(), moduleName);
+            this.initializeGenres();
         }
-        getMangaList(this.filter.getFilterString(), moduleName);
-        this.initializeGenres();
+        // getMangaList(this.filter.getFilterString(), moduleName);
+        // this.initializeGenres();
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
@@ -126,34 +128,41 @@ class Main extends React.Component {
         this.scrollView.scrollToEnd();
     }
 
+    generateMangaList = () => {
+      const { store: { mangaList : { list } } } = this.props;
+      return (
+      list && (
+        <FlatList
+          data={list}
+          keyExtractor={this.keyExtractor}
+          renderItem={({item}) => {
+            if (!item.name) {
+                return false;
+            }
+            return (
+              <TouchableOpacity onPress={() => { this.openMangaLink(item); }} style={styles.touchableOpacity}>
+                <Image
+                  style={styles.itemImage}
+                  source={{uri: item.img}}
+                />
+                <Text style={styles.itemScore}>{item.itemScore}</Text>
+                <View style={styles.itemTextContainer}>
+                  <Text style={styles.itemText}>{`${item.name}`}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+        }}
+        />
+        )
+      );
+    }
+
     render() {
-        const { store: { mangaList : { isLoading, list }, mangaGenres } } = this.props;
+        const { store: { mangaList : { isLoading }, mangaGenres } } = this.props;
         return (
           <ScrollView ref={(ref) => this.scrollView = ref} pagingEnabled horizontal style={styles.container}>
             <View style={styles.contentContainer}>
-              {list && (
-                <FlatList
-                  data={list}
-                  keyExtractor={this.keyExtractor}
-                  renderItem={({item}) => {
-                    if (!item.name) {
-                        return false;
-                    }
-                    return (
-                      <TouchableOpacity onPress={() => { this.openMangaLink(item); }} style={styles.touchableOpacity}>
-                        <Image
-                          style={styles.itemImage}
-                          source={{uri: item.img}}
-                        />
-                        <Text style={styles.itemScore}>{item.itemScore}</Text>
-                        <View style={styles.itemTextContainer}>
-                          <Text style={styles.itemText}>{`${item.name}`}</Text>
-                        </View>
-                      </TouchableOpacity>
-                    );
-                }}
-                />
-                )}
+              {this.generateMangaList()}
               <TouchableOpacity style={styles.rightButtonTouch} onPress={this.handleRightArrowPress}>
                 <Image
                   source={right_arrow}

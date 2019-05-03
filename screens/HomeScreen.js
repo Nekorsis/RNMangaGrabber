@@ -2,53 +2,69 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Image,
     Text,
     TouchableOpacity,
     View,
-    FlatList,
-    Button,
-    CheckBox,
-    ScrollView,
+    ViewPagerAndroid,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { changeModuleName } from '../actions';
+// need to import actions or the app will crush /?/
+import '../actions';
 import { screenNames } from '../constants/consts';
-import styles from './styles/Main';
+import styles from './styles/Home';
+import HotRelease from '../components/HotRelease';
 import siteNames from '../utils/sitenames';
-import siteImages from '../assets/images/siteimages';
+
 
 class Home extends React.Component {
+
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
         store: PropTypes.shape({}).isRequired,
     };
+
+
+    keyExtractor = (item, index) => item.name || index.toString();
     
     openMangaSite = (link) => {
         const { navigation: { navigate } } = this.props;
         navigate(screenNames.Site.name, { moduleName: link });
     }
 
-    createSiteLinks = (sites) => {
-        return sites.map((link, index) => {
+    createSiteLinks = () => {
+        return siteNames.map((link, index) => {
             return (
-                <View key={index}>
+              // eslint-disable-next-line react/no-array-index-key
+              <View style={styles.siteContainer} key={index}>
                 <TouchableOpacity onPress={() => { this.openMangaSite(link); }} style={styles.touchableOpacity}>
-                    <Image style={{ backgroundColor: 'red' }} source={siteImages[link]}/>
-                    <Text> {link} </Text>
+                  <Text style={styles.blockName}>
+                    {link.toUpperCase()}
+                  </Text>
                 </TouchableOpacity>
+                <View style={styles.hotRelease}>
+                  <HotRelease moduleName={link} openMangaLink={this.openMangaLink}  />
                 </View>
+                <View style={styles.hotRelease}>
+                  <HotRelease moduleName={link} openMangaLink={this.openMangaLink} />
+                </View>
+              </View>
             );
         });
+    }
 
+    openMangaLink = (manga, moduleName) => {
+      const { navigation: { navigate } } = this.props;
+      navigate(screenNames.ChaptersList.name, { manga, moduleName });
     }
 
     render() {
+      // TODO only Android for now, implement nested scroll view for ios for the future
         return (
-          <ScrollView style={styles.container}>
-          {this.createSiteLinks(siteNames)}
-          </ScrollView>
+          <ViewPagerAndroid 
+            style={styles.container}
+          >
+            {this.createSiteLinks()}
+          </ViewPagerAndroid>
         );
     }
 }

@@ -1,8 +1,6 @@
 export const repeatMaxCounter = 10;
 
-export const maxHotItems = 5;
-
-export const moduleName = 'mangaFox';
+export const moduleName = 'fake';
 
 export const screenNames = { 
     Chapter: { name: moduleName + 'Chapter' }, 

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
@@ -8,9 +9,11 @@ import {
     reduxifyNavigator,
     createReactNavigationReduxMiddleware,
 } from 'react-navigation-redux-helpers';
+
+
 import HarwareNavigation from './HarwareNavigation';
 import routes from './navigation/AppNavigator';
-import reducer from './reducers/reducers.js';
+import reducer from './reducers/reducers';
 
 const reactNavigationMiddleware = createReactNavigationReduxMiddleware('root', state => state.nav);
 
@@ -25,29 +28,6 @@ export default class App extends React.Component {
   state = {
       isLoadingComplete: false,
   };
-
-  render() {
-      if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
-          return (
-              <Provider store={store}>
-                  <AppLoading
-                      startAsync={this._loadResourcesAsync}
-                      onError={this._handleLoadingError}
-                      onFinish={this._handleFinishLoading}
-                  />
-              </Provider>
-          );
-      } else {
-          return (
-              <Provider store={store}>
-                  <View style={styles.container}>
-                      {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-                      <HarwareNavigation />
-                  </View>
-              </Provider>
-          );
-      }
-  }
 
   _loadResourcesAsync = async () => {
       return Promise.all([
@@ -74,6 +54,29 @@ export default class App extends React.Component {
   _handleFinishLoading = () => {
       this.setState({ isLoadingComplete: true });
   };
+
+  render() {
+    if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
+        return (
+          <Provider store={store}>
+            <AppLoading
+              startAsync={this._loadResourcesAsync}
+              onError={this._handleLoadingError}
+              onFinish={this._handleFinishLoading}
+            />
+          </Provider>
+        );
+    } else {
+        return (
+          <Provider store={store}>
+            <View style={styles.container}>
+              {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+              <HarwareNavigation ReduxifiedNav={ReduxifiedNav} />
+            </View>
+          </Provider>
+        );
+    }
+}
 }
 
 const styles = StyleSheet.create({

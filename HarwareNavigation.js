@@ -1,8 +1,8 @@
+/* eslint-disable react/jsx-filename-extension */
 import React, { Component } from 'react';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import { BackHandler } from 'react-native';
-import { ReduxifiedNav } from './App';
 
 class Navigation extends Component {
     componentDidMount() {
@@ -20,6 +20,7 @@ class Navigation extends Component {
       return true;
   };
   render() {
+    const { ReduxifiedNav } = this.props;
       return <ReduxifiedNav
           state={this.props.state}
           dispatch={this.props.dispatch}

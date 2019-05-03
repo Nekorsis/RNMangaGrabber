@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { NavigationActions } from 'react-navigation';
 import { initState as initialState } from '../store';
 import AppNavigator from '../navigation/AppNavigator';
-import { actionTypes } from '../actions';
+import { actionTypes } from '../actions/common';
 
 // import modules from '../modules';
 
@@ -57,6 +57,10 @@ const appReducer = (state = initialState, action) => {
         case actionTypes.SAVE_CHAPTER_IMAGES: {
             const { imagesArray } = action.payload;
             return { ...state, imagesInfo: { ...state.imagesInfo, imagesArray, isLoading: false } };
+        }
+        case actionTypes.SET_HOT_CATEGORY: {
+            const { moduleName, hotInfo } = action.payload;
+            return { ...state, hotCategories: { ...state.hotCategories, [moduleName]: hotInfo } };
         }
         default:
             break;
