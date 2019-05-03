@@ -1,8 +1,7 @@
 module.exports = {
     "env": {
-        "browser": true,
-        "commonjs": true,
-        "es6": true
+        "react-native/react-native": true,
+        "commonjs": true
     },
     "extends": "eslint:recommended",
     "parser": "babel-eslint",
@@ -14,13 +13,15 @@ module.exports = {
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+        "react-native"
     ],
     "rules": {
-        "indent": [
-            "error",
-            4
-        ],
+        "react-native/no-unused-styles": 2,
+        "react-native/split-platform-components": 2,
+        "react-native/no-inline-styles": 2,
+        "react-native/no-color-literals": 2,
+        "react-native/no-raw-text": 2,
         "linebreak-style": [
             "error",
             "windows"

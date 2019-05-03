@@ -1,52 +1,54 @@
+/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Image,
-    Platform,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
     FlatList,
-    Linking,
+    Button,
+    CheckBox,
+    ScrollView,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { MangaStreamUrl } from '../constants/Network';
-import { bindActionCreator } from '../utils/Utils';
-import { fetchMangaDataAsync } from '../actions/actions';
+import { bindActionCreators } from 'redux';
+import { changeModuleName } from '../actions';
+import { screenNames } from '../constants/consts';
+import styles from './styles/Main';
+import siteNames from '../utils/sitenames';
+import siteImages from '../assets/images/siteimages';
 
-//const DomParser = require('react-native-html-parser').DOMParser;
-
-class HomeScreen extends React.Component {
-    componentDidMount() {
-        this.props.getMangaData(MangaStreamUrl);
+class Home extends React.Component {
+    static propTypes = {
+        navigation: PropTypes.shape({}).isRequired,
+        store: PropTypes.shape({}).isRequired,
+    };
+    
+    openMangaSite = (link) => {
+        const { navigation: { navigate } } = this.props;
+        navigate(screenNames.Site.name, { moduleName: link });
     }
 
-    openMangaLink = (url) => {
-        this.props.navigation.navigate('WebView', { viewUrl: url });
-        // Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    createSiteLinks = (sites) => {
+        return sites.map((link, index) => {
+            return (
+                <View key={index}>
+                <TouchableOpacity onPress={() => { this.openMangaSite(link); }} style={styles.touchableOpacity}>
+                    <Image style={{ backgroundColor: 'red' }} source={siteImages[link]}/>
+                    <Text> {link} </Text>
+                </TouchableOpacity>
+                </View>
+            );
+        });
+
     }
 
     render() {
-        const { mangaData } = this.props.store;
         return (
-            <View style={styles.container}>
-                <View style={styles.welcomeContainer}>
-                    <View style={styles.contentContainer}>
-                        {mangaData && <FlatList
-                            data={mangaData}
-                            renderItem={({item}) => {
-                                return (
-                                    <TouchableOpacity>
-                                        <Text>{item.name}</Text>
-                                        <Text>{item.date}</Text>
-                                        <Text onPress={() => {this.openMangaLink(`${MangaStreamUrl}${item.link}`);}}>{`${MangaStreamUrl}${item.link}`}</Text>
-                                    </TouchableOpacity>
-                                );
-                            }}
-                        />}
-                    </View>   
-                </View>
-            </View>
+          <ScrollView style={styles.container}>
+          {this.createSiteLinks(siteNames)}
+          </ScrollView>
         );
     }
 }
@@ -55,97 +57,4 @@ const mapStateToProps = state => ({
     store: state.appReducer,
 });
 
-const mapDispatchToProps = dispatch => ({
-    getMangaData: bindActionCreator(fetchMangaDataAsync, dispatch),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
-
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    developmentModeText: {
-        marginBottom: 20,
-        color: 'rgba(0,0,0,0.4)',
-        fontSize: 14,
-        lineHeight: 19,
-        textAlign: 'center',
-    },
-    contentContainer: {
-        paddingTop: 30,
-    },
-    welcomeContainer: {
-        alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 20,
-    },
-    welcomeImage: {
-        width: 100,
-        height: 80,
-        resizeMode: 'contain',
-        marginTop: 3,
-        marginLeft: -10,
-    },
-    getStartedContainer: {
-        alignItems: 'center',
-        marginHorizontal: 50,
-    },
-    homeScreenFilename: {
-        marginVertical: 7,
-    },
-    codeHighlightText: {
-        color: 'rgba(96,100,109, 0.8)',
-    },
-    codeHighlightContainer: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        borderRadius: 3,
-        paddingHorizontal: 4,
-    },
-    getStartedText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        lineHeight: 24,
-        textAlign: 'center',
-    },
-    tabBarInfoContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        ...Platform.select({
-            ios: {
-                shadowColor: 'black',
-                shadowOffset: { height: -3 },
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
-            },
-            android: {
-                elevation: 20,
-            },
-        }),
-        alignItems: 'center',
-        backgroundColor: '#fbfbfb',
-        paddingVertical: 20,
-    },
-    tabBarInfoText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        textAlign: 'center',
-    },
-    navigationFilename: {
-        marginTop: 5,
-    },
-    helpContainer: {
-        marginTop: 15,
-        alignItems: 'center',
-    },
-    helpLink: {
-        paddingVertical: 15,
-    },
-    helpLinkText: {
-        fontSize: 14,
-        color: '#2e78b7',
-    },
-});
+export default connect(mapStateToProps)(Home);

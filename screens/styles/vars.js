@@ -1,6 +1,6 @@
 import { Dimensions } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default {
     white: '#fff',
@@ -10,4 +10,5 @@ export default {
     blue: 'blue',
     lightBlue: 'lightblue',
     width,
+    height,
 };

@@ -13,11 +13,11 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox } from '../actions';
-import right_arrow from '../../../assets/images/right_arrow.png';
-import { screenNames, reducerName } from '../config/consts';
-import Filter from '../lib/filter'; 
-import styles from '../styles/Main';
+import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox, changeModuleName } from '../actions';
+import right_arrow from '../assets/images/right_arrow.png';
+import { screenNames } from '../constants/consts';
+import Filter from '../utils/filter'; 
+import styles from './styles/Main';
 
 class Main extends React.Component {
     static propTypes = {
@@ -25,6 +25,7 @@ class Main extends React.Component {
         getMangaList: PropTypes.func.isRequired,
         store: PropTypes.shape({}).isRequired,
         changeGenreCheckbox: PropTypes.func.isRequired,
+        changeModule: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -34,31 +35,35 @@ class Main extends React.Component {
     }
 
     componentDidMount() {
-        const { getMangaList } = this.props;
-        getMangaList(this.filter.getFilterString());
-        this.initializeFilter();
+        const { getMangaList, navigation: { state: { params: { moduleName } = {} } }, store, changeModule } = this.props;
+        // getting module name from params, used when we will dispatch actions.
+        if(store.moduleName !== moduleName) {
+            changeModule(moduleName);
+            this.moduleName = moduleName;
+        }
+        getMangaList(this.filter.getFilterString(), moduleName);
+        this.initializeGenres();
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
 
-    initializeFilter = async () => {
+    initializeGenres = async () => {
         const { getMangaGenres } = this.props;
-        getMangaGenres();
+        getMangaGenres(this.moduleName);
     }
 
     openMangaLink = (manga) => {
         const { navigation: { navigate } } = this.props;
-        navigate(screenNames.ChaptersList.name, { manga });
+        navigate(screenNames.ChaptersList.name, { manga, moduleName: this.moduleName });
     }
 
-    // TODO handle next page when searching;
     onPressNextPage = async () => {
         const { currentPage } = this.state;
         const { getMangaList } = this.props;
         const nextPage = currentPage + 1;
         this.setState({ currentPage: nextPage});
         this.filter.setPage(nextPage);
-        await getMangaList(this.filter.getFilterString());
+        await getMangaList(this.filter.getFilterString(), this.moduleName);
     }
 
     onPressPrevPage = async () => {
@@ -70,7 +75,7 @@ class Main extends React.Component {
         const nextPage = currentPage - 1;
         this.setState({ currentPage: nextPage });
         this.filter.setPage(nextPage);
-        await getMangaList(this.filter.getFilterString());
+        await getMangaList(this.filter.getFilterString(), this.moduleName);
     }
 
     generateGenreCheckboxes = () => {
@@ -188,7 +193,7 @@ class Main extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    store: state[reducerName],
+    store: state.appReducer,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -196,5 +201,6 @@ const mapDispatchToProps = dispatch => ({
     getMangaGenres: bindActionCreators(fetchMangaGenresAsync, dispatch),
     searchManga: bindActionCreators(searchMangaAsync, dispatch),
     changeGenreCheckbox: bindActionCreators(setGenreCheckbox, dispatch),
+    changeModule: bindActionCreators(changeModuleName, dispatch),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Main);

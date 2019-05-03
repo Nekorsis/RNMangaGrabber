@@ -8,7 +8,7 @@ import {
     reduxifyNavigator,
     createReactNavigationReduxMiddleware,
 } from 'react-navigation-redux-helpers';
-import AppNavigator from './AppNavigator';
+import HarwareNavigation from './HarwareNavigation';
 import routes from './navigation/AppNavigator';
 import reducer from './reducers/reducers.js';
 
@@ -42,7 +42,7 @@ export default class App extends React.Component {
               <Provider store={store}>
                   <View style={styles.container}>
                       {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-                      <AppNavigator />
+                      <HarwareNavigation />
                   </View>
               </Provider>
           );

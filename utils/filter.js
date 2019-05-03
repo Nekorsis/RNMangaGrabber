@@ -1,4 +1,4 @@
-import { mangaDirectoryUrl, searchPath } from '../config/Network';
+import { mangaDirectoryUrl, searchPath } from '../constants/Network';
 
 export const singleGenreFilterTemplate = (page, genre) => `${page > 1 ? `page=${page}&` : ''}title=&genres=${genre}&nogenres=&sort=&stype=1&name=&type=0&author_method=cw&author=&artist_method=cw&artist=&rating_method=eq&rating=&released_method=eq&released=&st=0`;
 export const multipleGenreFilterTemplate = (page, genres) => `${page > 1 ? `page=${page}&` : ''}title=&genres=${genres}&st=0&sort=&stype=1&name_method=cw&name=&author_method=cw&author=&artist_method=cw&artist=&type=&rating_method=eq&rating=&released_method=eq&released=`;
