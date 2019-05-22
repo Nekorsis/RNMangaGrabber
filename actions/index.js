@@ -11,6 +11,7 @@ const funcNames = {
     getMangaChaptersList: 'getMangaChaptersList',
     fetchChapter: 'fetchChapter',
     fetchHotCategoryAsync: 'fetchHotCategoryAsync',
+    fetchAll: 'fetchAll',
 };
 
 // getting all of the module actions.
@@ -18,6 +19,7 @@ const modulesReducersActions = modules.reduce((accumulator, mod) => {
     const { moduleName, actions } = mod;
     return { ...accumulator, [moduleName]: actions };
 }, {});
+
 
 const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
     const moduleName = name || getState().appReducer.moduleName;
@@ -28,12 +30,14 @@ const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
     }
 
     const moduleBlock = modulesReducersActions[moduleName];
+   
     if (!moduleBlock) {
         console.log('missing module: ' + name);
         return;
     }
 
     const func = moduleBlock[funcName];
+
     if (!func) {
         console.log('missing func: ' + funcName);
         return;
@@ -50,7 +54,7 @@ export const fetchMangaGenresAsync = (name) => {
 
 export const fetchHotCategoryAsync = (name) => {
     return function(dispatch, getState) {
-        return funcCaller(funcNames.fetchHotCategoryAsync, getState, name, dispatch, name);
+        return funcCaller(funcNames.fetchHotCategoryAsync, getState, name, dispatch);
     };
 };
 
@@ -97,6 +101,12 @@ export const deleteMangaChapter = (chapterPromise) => {
 export const fetchChapter = (url, name) => {
     return (dispatch, getState) => {
         return funcCaller(funcNames.fetchChapter, getState, name, dispatch, url);
+    };
+};
+
+export const fetchAll = (name, mangaChaptersList) => {
+    return (dispatch, getState) => {
+        return funcCaller(funcNames.fetchAll, getState, name, dispatch, mangaChaptersList);
     };
 };
 

@@ -4,7 +4,7 @@ export const multipleGenreFilterTemplate = (page, genres) => `${page > 1 ? `page
 const testTemplate = { page: 'page=', title: 'title=', genres: 'genres=', additionalGenres: '2C' };
 
 // TODO clear filter mess in store;
-export default class Filter {
+export default class ScrollFilter {
     constructor(mangaDirectoryUrl, searchPath) {
         this.mangaDirectoryUrl = mangaDirectoryUrl;
         this.searchPath = searchPath;
@@ -65,7 +65,7 @@ export default class Filter {
         // if (genres.length <= 0) {
         //     return this.mangaDirectoryUrl + `/${page}.html`;
         // }
-        return this.mangaDirectoryUrl + `/${page}.html`;
+        return this.searchPath;
         // return searchPath + `${page > 1 ? `${template.page}${page}&` : ''}${template.title}&${template.genres}${this.correctFilterGenreCount(genres)}&st=0&sort=&stype=1&name_method=cw&name=&author_method=cw&author=&artist_method=cw&artist=&type=&rating_method=eq&rating=&released_method=eq&released=`;
     };
 }

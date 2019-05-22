@@ -16,8 +16,9 @@ export default StyleSheet.create({
     flatList: {
         marginTop: 10,
         borderRadius: 8,
-        borderColor: 'blue',
-        maxHeight: '35%',
+        borderColor: vars.blue,
+        maxHeight: '70%',
+        backgroundColor:vars.red,
         marginHorizontal: 1,
         borderStyle: 'solid',
     },

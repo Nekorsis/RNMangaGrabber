@@ -1,5 +1,5 @@
 import { mangaPath, searchPath, hotPath } from '../config/Network';
-import { repeatMaxCounter } from '../config/consts';
+import { repeatMaxCounter, moduleName } from '../config/consts';
 import { 
     setMangaGenres, 
     setLoadingState, 
@@ -15,7 +15,7 @@ const nameRegex = /title="(.*?)"><img\s/;
 const linkRegex = /<a href="\/manga\/(.+?)\/"/;
 const itemScoreRegex = /<span class="item-score">(\d+\.\d+)<\/span>/;
 
-export const fetchHotCategoryAsync = (moduleName) => {
+export const fetchHotCategoryAsync = () => {
     return async function(dispatch) {
         // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
@@ -314,7 +314,7 @@ const fetchImage = ({ url, chapterUrl }) => {
             method: 'GET',
             headers: blobHeaders,
         });
-        if (blobResp._bodyBlob._data.size <= 0) {
+        if (blobResp._bodyText.length <= 0) {
             let interval;
             let repeatCounter = 0;
             blobResp = await new Promise((fetchResolve) => {
@@ -326,7 +326,7 @@ const fetchImage = ({ url, chapterUrl }) => {
                         headers: blobHeaders,
                     });
                     repeatCounter += 1 ;
-                    if (blobResponse._bodyBlob._data.size >= 0 || repeatCounter >= repeatMaxCounter) {
+                    if (blobResponse._bodyText.length >= 0 || repeatCounter >= repeatMaxCounter) {
                         fetchResolve(blobResponse);
                         // clearInterval(interval);
                     }
@@ -334,9 +334,8 @@ const fetchImage = ({ url, chapterUrl }) => {
             });
             clearInterval(interval);
         }
-        const text = await blobResp.text();
         var d;
-        eval(text);
+        eval(blobResp._bodyText);
         const regex = /http:.*/;
         const fixedImgArray = d.map((imgsrc) => {
             return { url: imgsrc.match(regex) ? imgsrc : 'http:' + imgsrc };

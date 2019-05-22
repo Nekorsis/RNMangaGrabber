@@ -15,4 +15,16 @@ import SiteScreen from '../screens/SiteScreen';
 //     return { ...accumulator, ...convertedScreens };
 // }, {});
 
-export default createStackNavigator({ Home: { screen: HomeScreen }, ChaptersList: { screen: ChaptersListScreen }, Chapter: { screen: ChapterScreen }, Site: { screen: SiteScreen } });
+export default createStackNavigator({ 
+    Home: { screen: HomeScreen }, 
+    ChaptersList: { screen: ChaptersListScreen }, 
+    Chapter: { screen: ChapterScreen }, 
+    Site: { screen: SiteScreen } 
+});
+
+// export default createStackNavigator({ 
+//     Home: { screen: HomeScreen }, 
+//     ChaptersList: { screen: ChaptersListScreen }, 
+//     Chapter: { screen: ChapterScreen }, 
+//     Site: { screen: SiteScreen } 
+// }, { defaultNavigationOptions: {} });

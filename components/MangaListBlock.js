@@ -1,16 +1,14 @@
 /* eslint-disable react/jsx-filename-extension */
 import React, { Fragment, PureComponent } from 'react';
 import {
-    Image,
     Text,
-    TouchableOpacity,
-    View,
     ScrollView,
     ActivityIndicator,
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import styles from './styles/MangaList';
+// import styles from './styles/MangaList';
+import MappedList from './MappedList';
 
 class MangaList extends PureComponent {
   static propTypes = {
@@ -18,6 +16,7 @@ class MangaList extends PureComponent {
     list: PropTypes.arrayOf(PropTypes.shape({})),
     blockName: PropTypes.string.isRequired,
     openMangaLink: PropTypes.func.isRequired,
+    styles: PropTypes.shape({}).isRequired
   };
   static defaultProps = {
     list: [],
@@ -25,13 +24,8 @@ class MangaList extends PureComponent {
 
   keyExtractor = (item, index) => item.name || index.toString();
 
-  touchableOpacityOnPress = (item) => () => {
-    const { openMangaLink, moduleName } = this.props;
-    return openMangaLink(item, moduleName);
-  }
-
   render() {
-    const { list, blockName } = this.props;
+    const { list, blockName, styles } = this.props;
     return (
       list.length > 0 ? (
         <Fragment>
@@ -43,23 +37,7 @@ class MangaList extends PureComponent {
             horizontal
             style={styles.flatList}
           >
-            {list.map((item, index) => {
-              return (
-                <TouchableOpacity 
-                  onPress={this.touchableOpacityOnPress(item)} 
-                  style={styles.touchableOpacity} 
-                  key={this.keyExtractor(item.name, index)}
-                >
-                  <Image
-                    style={styles.itemImage}
-                    source={{uri: item.img}}
-                  />
-                  <View style={styles.itemTextContainer}>
-                    <Text style={styles.itemText}>{`${item.name}`}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-          })}
+            <MappedList {...this.props} />
           </ScrollView>
         </Fragment>
         ) :

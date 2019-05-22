@@ -29,7 +29,8 @@ const appReducer = (state = initialState, action) => {
         }
         case actionTypes.SET_LOADING_STATE: {
             const { isLoading, name } = action.payload;
-            return { ...state, [name] : {...state[name], isLoading } };
+            // return { ...state, [name] : {...state[name], isLoading } };
+            return { ...state, isLoading };
         }
         case actionTypes.SET_GENRE_CHECKBOX: {
             const { index, isActive } = action.payload;

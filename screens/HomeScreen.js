@@ -8,6 +8,8 @@ import {
     ViewPagerAndroid,
 } from 'react-native';
 import { connect } from 'react-redux';
+
+
 // need to import actions or the app will crush /?/
 import '../actions';
 import { screenNames } from '../constants/consts';
@@ -17,35 +19,31 @@ import siteNames from '../utils/sitenames';
 
 
 class Home extends React.Component {
-
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
         store: PropTypes.shape({}).isRequired,
     };
 
-
     keyExtractor = (item, index) => item.name || index.toString();
     
-    openMangaSite = (link) => {
+    openMangaSite = (mod) => {
         const { navigation: { navigate } } = this.props;
-        navigate(screenNames.Site.name, { moduleName: link });
+        navigate(screenNames.Site.name, mod);
     }
 
     createSiteLinks = () => {
-        return siteNames.map((link, index) => {
+        return siteNames.map((mod, index) => {
+          const { moduleName } = mod;
             return (
               // eslint-disable-next-line react/no-array-index-key
               <View style={styles.siteContainer} key={index}>
-                <TouchableOpacity onPress={() => { this.openMangaSite(link); }} style={styles.touchableOpacity}>
+                <TouchableOpacity onPress={() => { this.openMangaSite(mod); }} style={styles.touchableOpacity}>
                   <Text style={styles.blockName}>
-                    {link.toUpperCase()}
+                    {moduleName.toUpperCase()}
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.hotRelease}>
-                  <HotRelease moduleName={link} openMangaLink={this.openMangaLink}  />
-                </View>
-                <View style={styles.hotRelease}>
-                  <HotRelease moduleName={link} openMangaLink={this.openMangaLink} />
+                  <HotRelease moduleName={moduleName} openMangaLink={this.openMangaLink}  />
                 </View>
               </View>
             );

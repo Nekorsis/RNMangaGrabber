@@ -8,7 +8,10 @@ import {
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { fetchChapter, setLoadingState, rejectChapterLoad } from '../actions';
+
+
+import { fetchChapter, rejectChapterLoad } from '../actions';
+import { setLoadingState } from '../actions/common';
 import styles from './styles/Chapter';
 
 class Chapter extends React.Component {
@@ -27,7 +30,6 @@ class Chapter extends React.Component {
 
     componentWillUnmount() {
         const { changeLoadingState, rejectChapterLoad } = this.props;
-        console.log('Chapter unmount');
         changeLoadingState(true, 'imagesInfo');
         rejectChapterLoad();
     }

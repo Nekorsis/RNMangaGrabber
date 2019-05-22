@@ -13,38 +13,49 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { fetchMangaListAsync, fetchMangaGenresAsync, searchMangaAsync, setGenreCheckbox, changeModuleName } from '../actions';
+
+
+import { fetchMangaListAsync,
+  fetchMangaGenresAsync,
+  searchMangaAsync, 
+  setGenreCheckbox,
+  changeModuleName,
+} from '../actions';
 import right_arrow from '../assets/images/right_arrow.png';
 import { screenNames } from '../constants/consts';
-import Filter from '../utils/filter'; 
+import Filter from '../utils/filter';
+import ScrollingFilter from '../utils/scrollFilter';
+
 import styles from './styles/Main';
 
-class Main extends React.Component {
+class Site extends React.Component {
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
         getMangaList: PropTypes.func.isRequired,
         store: PropTypes.shape({}).isRequired,
         changeGenreCheckbox: PropTypes.func.isRequired,
         changeModule: PropTypes.func.isRequired,
+        getMangaGenres: PropTypes.func.isRequired,
     };
 
     constructor(props) {
         super(props);
-        this.filter = new Filter();
-        this.state = { currentPage: 1 };
+        console.log('constructor Site');
+        const { navigation: { state: { params: { mangaDirectoryUrl, searchPath, scrollFilter } = {} } }} = props;
+        this.filter = scrollFilter ? new ScrollingFilter(mangaDirectoryUrl, searchPath) : new Filter(mangaDirectoryUrl, searchPath);
+        // this.state = { currentPage: 1 };
     }
 
     componentDidMount() {
         const { getMangaList, navigation: { state: { params: { moduleName } = {} } }, store, changeModule } = this.props;
-        this.moduleName = moduleName;
-        // getting module name from params, used when we will dispatch actions.
-        if(store.moduleName !== moduleName) {
-            changeModule(moduleName);
-            getMangaList(this.filter.getFilterString(), moduleName);
+        
+        this.moduleName = moduleName || this.moduleName;
+
+        if(store.moduleName !== this.moduleName) {
+            changeModule(this.moduleName);
+            getMangaList(this.filter.getFilterString(), this.moduleName);
             this.initializeGenres();
         }
-        // getMangaList(this.filter.getFilterString(), moduleName);
-        // this.initializeGenres();
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
@@ -59,25 +70,16 @@ class Main extends React.Component {
         navigate(screenNames.ChaptersList.name, { manga, moduleName: this.moduleName });
     }
 
-    onPressNextPage = async () => {
-        const { currentPage } = this.state;
+    onPressNextPage = () => {
         const { getMangaList } = this.props;
-        const nextPage = currentPage + 1;
-        this.setState({ currentPage: nextPage});
-        this.filter.setPage(nextPage);
-        await getMangaList(this.filter.getFilterString(), this.moduleName);
+        this.filter.nextPage();
+        getMangaList(this.filter.getFilterString(), this.moduleName);
     }
 
-    onPressPrevPage = async () => {
-        const { currentPage } = this.state;
+    onPressPrevPage = () => {
         const { getMangaList } = this.props;
-        if(currentPage < 2) {
-            return;
-        }
-        const nextPage = currentPage - 1;
-        this.setState({ currentPage: nextPage });
-        this.filter.setPage(nextPage);
-        await getMangaList(this.filter.getFilterString(), this.moduleName);
+        this.filter.prevPage();
+        getMangaList(this.filter.getFilterString(), this.moduleName);
     }
 
     generateGenreCheckboxes = () => {
@@ -94,7 +96,7 @@ class Main extends React.Component {
             renderItem={({item}) => {
                     return (
                       <View key={item.index} style={styles.checkbox}>
-                        <CheckBox value={item.isActive} onValueChange={() => this.changeCheckbox(item.index)} />
+                        <CheckBox value={item.isActive} onValueChange={this.changeCheckbox(item.index)} />
                         <Text style={styles.checkboxText}>
                           {item.name}
                         </Text>
@@ -105,7 +107,7 @@ class Main extends React.Component {
         );
     }
 
-    changeCheckbox = (index) => {
+    changeCheckbox = (index) => () => {
         const { store: { mangaGenres }, changeGenreCheckbox } = this.props;
         if (mangaGenres && mangaGenres[index]) {
             changeGenreCheckbox(index, !mangaGenres[index].isActive);
@@ -119,7 +121,6 @@ class Main extends React.Component {
 
     onPressStartSearch = () => {
         const { getMangaList } = this.props;
-        this.setState({ currentPage: 1 });
         this.filter.setPage(1);
         getMangaList(this.filter.getFilterString());
     }
@@ -212,4 +213,4 @@ const mapDispatchToProps = dispatch => ({
     changeGenreCheckbox: bindActionCreators(setGenreCheckbox, dispatch),
     changeModule: bindActionCreators(changeModuleName, dispatch),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default connect(mapStateToProps, mapDispatchToProps)(Site);

@@ -6,13 +6,18 @@ import { bindActionCreators } from 'redux';
 
 import { fetchHotCategoryAsync } from '../actions';
 import MangaListBlock from './MangaListBlock';
+import styles from './styles/MangaList';
 
 const BLOCK_NAME = 'Hot Releases';
 
 class HotRelease extends React.Component {
   componentDidMount() {
-    const { moduleName, getHotCategory } = this.props;
-    
+    const { moduleName, getHotCategory, store } = this.props;
+
+    const { hotCategories: { [moduleName]: hotInfo } = {} } = store;
+    if(hotInfo) {
+      return;
+    }
     getHotCategory(moduleName);
   }
 
@@ -25,6 +30,7 @@ class HotRelease extends React.Component {
         blockName={BLOCK_NAME} 
         list={hotInfo} 
         moduleName={moduleName}
+        styles={styles}
         {...extra}
       />
     );
