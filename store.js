@@ -15,7 +15,8 @@ export const initState = {
         filterUrl: null,
     },
     chapterPromise: null,
-    moduleName: null,
+    moduleName: 'mangaFox',
     hotCategories: {},
+    readingNowCategories: {},
 };
 export default initState;

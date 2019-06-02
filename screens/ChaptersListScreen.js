@@ -32,8 +32,8 @@ class ChaptersList extends React.Component {
     }
 
     openChapter = (chapter) => {
-        const { navigation: { navigate, state: { params: { moduleName } = {} } } } =  this.props;
-        navigate(screenNames.Chapter.name, { chapter, moduleName });
+        const { navigation: { navigate, state: { params: { moduleName, ...other } = {} } } } =  this.props;
+        navigate(screenNames.Chapter.name, { chapter, moduleName, ...other });
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
@@ -51,15 +51,15 @@ class ChaptersList extends React.Component {
               <ActivityIndicator /> 
             : (
               <React.Fragment>
-                <View>
+                {/* <View>
                   <Button
                     onPress={this.downloadAllNovel}
                     title="Download All"
                     color="#841584"
                     accessibilityLabel="Learn more about this purple button"
                   />
-                </View>
-                <View>
+                </View> */}
+                <View style={styles.container}>
                   <FlatList
                     data={mangaChaptersList}
                     keyExtractor={this.keyExtractor}

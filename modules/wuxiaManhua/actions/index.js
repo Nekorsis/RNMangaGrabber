@@ -1,21 +1,13 @@
-import { FileSystem } from 'expo';
-
-import { mangaPath, searchPath, hotPath, novelPath, mangaUrl } from '../config/Network';
-import { repeatMaxCounter, moduleName } from '../config/consts';
+import { hotPath, novelPath, mangaUrl } from '../config/Network';
+import { moduleName } from '../config/consts';
 import { 
-    setMangaGenres, 
     setLoadingState, 
     setMangaList, 
-    saveChapterImages, 
     setMangaChapter, 
     setMangaChaptersList,
     setHotCategory,
+    saveChapterImages,
 } from '../../../actions/common';
-
-const imgSrcRegex = /img.+?src="(.+?)".+?<\/a>/;
-const nameRegex = /title="(.*?)"><img\s/;
-const linkRegex = /<a href="\/manga\/(.+?)\/"/;
-const itemScoreRegex = /<span class="item-score">(\d+\.\d+)<\/span>/;
 
 const bodyNovel = { 
     active: null,
@@ -41,7 +33,7 @@ export const fetchAll = (mangaChaptersList) => {
             if(result) {
                 accumulator = [...accumulator, result];
             }
-            return fetchChapter(index.link)(dispatch, getState).promise;
+            return fetchChapterMultipleImplement(index.link)(dispatch, getState).promise;
         })
         , Promise.resolve());
         
@@ -153,7 +145,7 @@ export const fetchMangaListAsync = (url) => {
                 const img = item.coverUrl;
                 return { name, link, img };
             });
-            dispatch(setLoadingState(false, 'mangaList'));
+            // dispatch(setLoadingState(false, 'mangaList'));
             return dispatch(setMangaList(itemsBlock));
         }
         catch (err) {
@@ -205,7 +197,7 @@ export const getMangaChaptersList = (url) => {
 };
 
 export const fetchChapterMultipleImplement = (url) => {
-    return (dispatch, getState) => {
+    return (dispatch) => {
         let cancel;
         const chapterObject = { promise: new Promise(async (resolve) => {
             cancel = (reason) => {
@@ -214,7 +206,6 @@ export const fetchChapterMultipleImplement = (url) => {
             };
             // eslint-disable-next-line no-undef
             const myHeaders = new Headers();
-            dispatch(setLoadingState(true, 'imagesInfo'));
             myHeaders.append('Content-Type', 'text/html');
             const respText = await (await fetch(url,{
                 mode: 'no-cors',
@@ -245,13 +236,12 @@ export const fetchChapterMultipleImplement = (url) => {
 export const fetchChapter = (url) => {
     return (dispatch, getState) => {
         let cancel;
-        let innerPromise;
         let { appReducer: { chapterPromise } } = getState();
         if (chapterPromise) {
             chapterPromise.cancel('Rejected by another request');
             dispatch(setMangaChapter(null));
         }
-        const chapterObject = { promise: new Promise(async (resolve, reject) => {
+        const chapterObject = { promise: new Promise(async (resolve) => {
             cancel = (reason) => {
                 dispatch(setMangaChapter(null));
                 console.log('cancel is triggered');
@@ -276,6 +266,10 @@ export const fetchChapter = (url) => {
 
             if (matchedText) {
                 const textArray = matchedText.replace(/<p>/g, '\n').replace(/<\/p>/g, '');
+                // console.log(textArray);
+                // dispatch(setLoadingState(false, 'imagesInfo'));
+                dispatch(setMangaChapter(null));
+                dispatch(saveChapterImages(textArray));
                 resolve(textArray);
             }
             resolve('matchedText in fetchChapter is empty');

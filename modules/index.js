@@ -2,6 +2,6 @@
 import mangaFox from './mangaFoxFetch/index';
 import wuxiaManhua from './wuxiaManhua/index';
 
-const array = [ wuxiaManhua ];
+const modules = { mangaFox };
 
-export default array;
+export default modules;

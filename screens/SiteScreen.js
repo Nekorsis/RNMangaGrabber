@@ -40,7 +40,6 @@ class Site extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log('constructor Site');
         const { navigation: { state: { params: { mangaDirectoryUrl, searchPath, scrollFilter } = {} } }} = props;
         this.filter = scrollFilter ? new ScrollingFilter(mangaDirectoryUrl, searchPath) : new Filter(mangaDirectoryUrl, searchPath);
         // this.state = { currentPage: 1 };
@@ -51,11 +50,14 @@ class Site extends React.Component {
         
         this.moduleName = moduleName || this.moduleName;
 
-        if(store.moduleName !== this.moduleName) {
-            changeModule(this.moduleName);
-            getMangaList(this.filter.getFilterString(), this.moduleName);
-            this.initializeGenres();
-        }
+        // if(store.moduleName !== this.moduleName) {
+        //     changeModule(this.moduleName);
+        //     getMangaList(this.filter.getFilterString(), this.moduleName);
+        //     this.initializeGenres();
+        // }
+        changeModule(this.moduleName);
+        getMangaList(this.filter.getFilterString(), this.moduleName);
+        this.initializeGenres();
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
@@ -66,8 +68,8 @@ class Site extends React.Component {
     }
 
     openMangaLink = (manga) => {
-        const { navigation: { navigate } } = this.props;
-        navigate(screenNames.ChaptersList.name, { manga, moduleName: this.moduleName });
+        const { navigation: { navigate, state: { params } } } = this.props;
+        navigate(screenNames.ChaptersList.name, { manga, moduleName: this.moduleName, ...params });
     }
 
     onPressNextPage = () => {

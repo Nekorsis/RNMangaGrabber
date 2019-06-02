@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {
     View,
     ActivityIndicator,
+    Text,
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { connect } from 'react-redux';
@@ -12,6 +13,7 @@ import { bindActionCreators } from 'redux';
 
 import { fetchChapter, rejectChapterLoad } from '../actions';
 import { setLoadingState } from '../actions/common';
+import NovelReader from '../components/common/NovelReader';
 import styles from './styles/Chapter';
 
 class Chapter extends React.Component {
@@ -36,16 +38,30 @@ class Chapter extends React.Component {
 
     keyExtractor = (item, index) => item.name || index.toString();
 
+    renderCorrectView = () => {
+        const { navigation: { state: { params: { isNovel = false } = {} } }, store: { imagesInfo: { imagesArray } } } =  this.props;
+        return (isNovel ? <NovelReader text={imagesArray} /> : <ImageViewer imageUrls={imagesArray} />);
+    }
+
     render() {
-        const { store: { imagesInfo: { isLoading, imagesArray } } } = this.props;
+        const { store: { imagesInfo: { isLoading, err } } } = this.props;
+        if (isLoading && err) {
+            return (
+              <View> 
+                <Text> 
+                  {err.toString()} 
+                </Text>
+              </View>
+            );
+        }
         return (
-          <View style={styles.container}>
-            {isLoading ? 
-              <ActivityIndicator size="large" color="#0000ff" />
-              : <ImageViewer imageUrls={imagesArray} />
-            }
-          </View>
-        );
+            <View style={styles.container}>
+                {isLoading ? 
+                <ActivityIndicator size="large" color="#0000ff" />
+                : this.renderCorrectView()
+                }
+            </View>
+            );
     }
 }
 

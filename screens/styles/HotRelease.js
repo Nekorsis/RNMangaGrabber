@@ -5,22 +5,16 @@ import {
 import vars from './vars';
 
 export default StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: vars.white,
-        display: 'flex',
-    },
-    contentContainer: {
-        width: vars.width,
+    contentView: {
+        borderWidth: 2,
+        borderColor: vars.brownWhite,
+        borderRadius: 7,
+        backgroundColor: vars.lightWhite,
+        maxHeight: '60%',
     },
     flatList: {
         marginTop: 10,
-        borderRadius: 8,
-        borderColor: vars.blue,
-        maxHeight: '70%',
-        backgroundColor:vars.red,
         marginHorizontal: 1,
-        borderStyle: 'solid',
     },
     itemImage: {
         width: 150,
@@ -38,16 +32,11 @@ export default StyleSheet.create({
     touchableOpacity: {
         flex: 1,
         marginRight: 10,
-        borderRightColor: vars.red,
-        borderLeftColor: vars.green,
-        borderLeftWidth: 2,
-        borderRightWidth: 2,
         alignItems: 'center',
-        borderRadius: (5),
     },
     blockName: {
         fontWeight: 'bold',
         fontSize: 25,
-        fontStyle: 'italic',
+        fontStyle: 'normal',
     },
 });

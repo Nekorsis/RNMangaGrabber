@@ -1,8 +1,9 @@
 /* eslint-disable react/jsx-filename-extension */
-import React, { Fragment, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import {
     Text,
     ScrollView,
+    View,
     ActivityIndicator,
 } from 'react-native';
 import PropTypes from 'prop-types';
@@ -12,15 +13,23 @@ import MappedList from './MappedList';
 
 class MangaList extends PureComponent {
   static propTypes = {
-    moduleName: PropTypes.string.isRequired,
     list: PropTypes.arrayOf(PropTypes.shape({})),
     blockName: PropTypes.string.isRequired,
     openMangaLink: PropTypes.func.isRequired,
-    styles: PropTypes.shape({}).isRequired
+    styles: PropTypes.shape({}).isRequired,
+    getList: PropTypes.func.isRequired,
   };
   static defaultProps = {
     list: [],
   };
+
+  componentDidMount() {
+    const { getList, list } = this.props;
+    if(list.length > 0) {
+      return;
+    }
+    getList();
+  }
 
   keyExtractor = (item, index) => item.name || index.toString();
 
@@ -28,7 +37,7 @@ class MangaList extends PureComponent {
     const { list, blockName, styles } = this.props;
     return (
       list.length > 0 ? (
-        <Fragment>
+        <View style={styles.contentView}>
           <Text style={styles.blockName}>
             {blockName}
           </Text>
@@ -39,7 +48,7 @@ class MangaList extends PureComponent {
           >
             <MappedList {...this.props} />
           </ScrollView>
-        </Fragment>
+        </View>
         ) :
         <ActivityIndicator />
       );

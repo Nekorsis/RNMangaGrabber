@@ -9,6 +9,9 @@ export default {
     green: 'green',
     blue: 'blue',
     lightBlue: 'lightblue',
+    lightWhite: '#dddcd7',
+    brownWhite: '#a3a29e',
+    darknessWhite: '#f2efef',
     width,
     height,
 };

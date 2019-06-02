@@ -14,8 +14,10 @@ const funcNames = {
     fetchAll: 'fetchAll',
 };
 
+
+
 // getting all of the module actions.
-const modulesReducersActions = modules.reduce((accumulator, mod) => {
+const modulesReducersActions = Object.values(modules).reduce((accumulator, mod) => {
     const { moduleName, actions } = mod;
     return { ...accumulator, [moduleName]: actions };
 }, {});

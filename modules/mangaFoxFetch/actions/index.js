@@ -15,6 +15,8 @@ const nameRegex = /title="(.*?)"><img\s/;
 const linkRegex = /<a href="\/manga\/(.+?)\/"/;
 const itemScoreRegex = /<span class="item-score">(\d+\.\d+)<\/span>/;
 
+global.d = '';
+
 export const fetchHotCategoryAsync = () => {
     return async function(dispatch) {
         // eslint-disable-next-line no-undef
@@ -101,6 +103,7 @@ export const fetchMangaGenresAsync = (callback) => {
 export const fetchMangaListAsync = (url) => {
     return async function(dispatch) {
         dispatch(setLoadingState(true, 'mangaList'));
+        console.log('fetchMangaListAsync');
         // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
@@ -113,6 +116,8 @@ export const fetchMangaListAsync = (url) => {
             });
 
             const textifiedResponse = await response.text();
+
+            
 
             const blocks = textifiedResponse.split('<li').reduce((accumulator, value) => {
                 const imgsrc = value.match(/img.+?src="(.+?)".+?<\/a>/);
@@ -221,6 +226,7 @@ export const getMangaChaptersList = (url) => {
 
 export const fetchChapter = (url) => {
     return (dispatch, getState) => {
+        try {
         let cancel;
         let innerPromise;
         let { appReducer: { chapterPromise } } = getState();
@@ -252,13 +258,24 @@ export const fetchChapter = (url) => {
             innerPromise = recursiveTimeoutFetchChapter({ url, chapterId, changedContent });
             innerPromise.promise.then((info) => {
                 dispatch(setMangaChapter(null));
+                if (info.err) {
+                    dispatch(saveChapterImages({ err: info.err }));
+                    resolve(info);
+                }
                 if (info) {
                     dispatch(saveChapterImages(info));
-                    resolve();
+                    resolve(info);
                 }
-            }).catch((err) => console.log('err', err));
+            }).catch((err) => { 
+                console.log('reject innerPromise');
+                dispatch(saveChapterImages({ err }));
+            });
         }), cancel};
         dispatch(setMangaChapter(chapterObject));
+    } catch(err) {
+        console.log('reject');
+        dispatch(saveChapterImages({ err }));
+    }
     };
 };
 
@@ -274,9 +291,15 @@ const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent }) => {
     let accumulator = [];
     let page = 1;
     timeout = () => {
+        try {
         setTimeout(async () => {
             const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
             images = await fetchImage({ url, chapterUrl });
+            if(images && images.err) {
+                clearTimeout(timeout);
+                reject(images.err);
+                return;
+            }
             const slicedArray = accumulator.slice(accumulator.length - images.length, accumulator.length);
             const preparedImages = images.reduce((reduce, item) => {
                 if (slicedArray.some((someItem) => item.url === someItem.url)) {
@@ -294,17 +317,23 @@ const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent }) => {
             page += 1;
             // page % 4 === 0 && dispatch(saveChapterImages(accumulator));
             timeout();
+
         }, 100);
+    } catch (err) {
+        clearTimeout(timeout);
+        reject(err);
+        }
     };
-    timeout();
+    timeout(); 
 }).catch((err) => {
     clearTimeout(timeout);
-    console.log(err); 
+    return { err };
 }), cancel };
 };
 
 const fetchImage = ({ url, chapterUrl }) => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
+        try { 
         // eslint-disable-next-line no-undef
         const blobHeaders = new Headers();
         blobHeaders.append('Content-Type', 'text/html');
@@ -334,13 +363,19 @@ const fetchImage = ({ url, chapterUrl }) => {
             });
             clearInterval(interval);
         }
-        var d;
         eval(blobResp._bodyText);
         const regex = /http:.*/;
-        const fixedImgArray = d.map((imgsrc) => {
+        // eval defines d var, webpack likes to dcompress vars and we can't use d right away, so i define array 
+        const arrrr = d;
+        const fixedImgArray = arrrr.map((imgsrc) => {
             return { url: imgsrc.match(regex) ? imgsrc : 'http:' + imgsrc };
         });
         resolve(fixedImgArray);
+        } catch(err) {
+            reject(err);
+        }
+    }).catch((err) => {
+        return { err };
     });
 };
 

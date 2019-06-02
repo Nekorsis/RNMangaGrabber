@@ -9,10 +9,10 @@ import {
 
 // import styles from './styles/MangaList';
 
-export default ({ list, openMangaLink, moduleName, styles }) => {
+export default ({ list, openMangaLink, styles }) => {
   const keyExtractor = (item, index) => item.name || index.toString();
   const touchableOpacityOnPress = (item) => () => {
-    return openMangaLink(item, moduleName);
+    return openMangaLink(item);
   };
   return (list.map(
     (item, index) => {
@@ -22,7 +22,7 @@ export default ({ list, openMangaLink, moduleName, styles }) => {
           style={styles.touchableOpacity} 
           key={keyExtractor(item.name, index)}
         >
-          { item.img && (
+          {item.img && (
           <Image
             style={styles.itemImage}
             source={{uri: item.img}}
