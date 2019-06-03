@@ -29,7 +29,8 @@ const appReducer = (state = initialState, action) => {
         }
         case actionTypes.SET_LOADING_STATE: {
             const { isLoading, name } = action.payload;
-            return { ...state, [name] : {...state[name], isLoading } };
+            return isLoading ? { ...state, [name] : {...state[name], isLoading, err: null } } :
+             { ...state, [name] : {...state[name], isLoading } };
         }
         case actionTypes.SET_GENRE_CHECKBOX: {
             const { index, isActive } = action.payload;
@@ -55,12 +56,22 @@ const appReducer = (state = initialState, action) => {
             return { ...state, mangaChapters: { mangaChaptersList, isLoading: false }, };
         }
         case actionTypes.SAVE_CHAPTER_IMAGES: {
-            const { imagesArray } = action.payload;
-            return { ...state, imagesInfo: { ...state.imagesInfo, imagesArray, isLoading: false } };
+            const { imagesArray, imagesArray: { err } } = action.payload;
+            return err ? { ...state, imagesInfo: { ...state.imagesInfo, err } }
+            : { ...state, imagesInfo: { ...state.imagesInfo, imagesArray, isLoading: false, err: false } };
+            // return { ...state, imagesInfo: { ...state.imagesInfo, imagesArray, isLoading: false, err } };
         }
         case actionTypes.SET_HOT_CATEGORY: {
             const { moduleName, hotInfo } = action.payload;
             return { ...state, hotCategories: { ...state.hotCategories, [moduleName]: hotInfo } };
+        }
+        case actionTypes.SET_READING_CATEGORY: {
+            const { moduleName, readingInfo } = action.payload;
+            return { ...state, readingNowCategories: { ...state.readingNowCategories, [moduleName]: readingInfo } };
+        }
+        case actionTypes.SET_ERROR: {
+            const { err } = action.payload;
+            return { ...state, err };
         }
         default:
             break;

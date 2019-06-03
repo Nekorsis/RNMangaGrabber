@@ -9,6 +9,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
+    "android": {
+      "package": "test.mangaReader"
+    },
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",

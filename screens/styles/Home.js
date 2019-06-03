@@ -7,7 +7,7 @@ import vars from './vars';
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: vars.white,
+        backgroundColor: vars.darknessWhite,
     },
     touchableOpacity: {
         marginTop: 25,
@@ -32,7 +32,11 @@ export default StyleSheet.create({
     },
     hotReleaseSecond: {
         flex: 1,
-        backgroundColor: 'blue',
+        backgroundColor: vars.blue,
+    },
+    rightButtonImage: {
+        width: 50,
+        height: 50,
     },
     
     siteContainer: {

@@ -7,7 +7,7 @@ import vars from './vars';
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: vars.white,
+        backgroundColor: vars.darknessWhite,
     },
     contentContainer: {
         width: vars.width,

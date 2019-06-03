@@ -14,6 +14,7 @@ import {
 import HarwareNavigation from './HarwareNavigation';
 import routes from './navigation/AppNavigator';
 import reducer from './reducers/reducers';
+import vars from './screens/styles/vars';
 
 const reactNavigationMiddleware = createReactNavigationReduxMiddleware('root', state => state.nav);
 
@@ -82,6 +83,6 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: vars.white,
     },
 });
