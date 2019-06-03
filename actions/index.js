@@ -1,9 +1,12 @@
 import modules from '../modules';
 import { 
-    setMangaChapter, 
+    setMangaChapter,
+    setError,
     actionTypes,
 } from './common';
 
+
+//TODO fetchHotCategoryAsync fetchReadingCategoryAsync repeating
 const funcNames = { 
     fetchMangaGenresAsync: 'fetchMangaGenresAsync',
     fetchMangaListAsync: 'fetchMangaListAsync',
@@ -11,6 +14,7 @@ const funcNames = {
     getMangaChaptersList: 'getMangaChaptersList',
     fetchChapter: 'fetchChapter',
     fetchHotCategoryAsync: 'fetchHotCategoryAsync',
+    fetchReadingCategoryAsync: 'fetchReadingCategoryAsync',
     fetchAll: 'fetchAll',
 };
 
@@ -45,7 +49,25 @@ const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
         return;
     }
 
-    return func(...extra)(dispatch, getState);
+    const promisedFunc = func(...extra)(dispatch, getState);
+
+    if(!promisedFunc) {
+        return;
+    }
+
+    const isPromise = typeof promisedFunc.then == 'function';
+
+    if(isPromise) {
+        return promisedFunc.catch((err) => {
+            const error = getState().appReducer.err;
+            if (error) {
+                return;
+            }
+            dispatch(setError(err));
+        });
+    }
+
+    return promisedFunc;
 };
 
 export const fetchMangaGenresAsync = (name) => {
@@ -57,6 +79,12 @@ export const fetchMangaGenresAsync = (name) => {
 export const fetchHotCategoryAsync = (name) => {
     return function(dispatch, getState) {
         return funcCaller(funcNames.fetchHotCategoryAsync, getState, name, dispatch);
+    };
+};
+
+export const fetchReadingCategoryAsync = (name) => {
+    return function(dispatch, getState) {
+        return funcCaller(funcNames.fetchReadingCategoryAsync, getState, name, dispatch);
     };
 };
 

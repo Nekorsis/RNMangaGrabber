@@ -12,23 +12,15 @@ export const blocksHorizontal = [[
         listName: listNames.hotCategory,
     },
     {
-        blockName: 'hotCategory', 
-        name: 'Hot ReleasesSSSSS',
+        blockName: 'readCategory', 
+        name: 'Reading Now',
         limit: 10,
         styles: HotCategoryStyles,
         viewStyles: HotCategoryStyles.viewStyles,
-        get: funcNames.getHotCategory,
-        listName: listNames.hotCategory,
+        get: funcNames.getReadingNow,
+        listName: listNames.readingNow,
     },
-], [{
-    blockName: 'hotCategory', 
-    name: 'Hot Releases',
-    limit: 10,
-    styles: HotCategoryStyles,
-    get: funcNames.getHotCategory,
-    viewStyles: HotCategoryStyles.viewStyles,
-    listName: listNames.hotCategory,
-}]];
+]];
 
 export const blocksVertical = [[
     {
@@ -40,4 +32,12 @@ export const blocksVertical = [[
         viewStyles: HotCategoryStyles.viewStyles,
         listName: listNames.hotCategory,
     }
-]];
+], [{
+    blockName: 'hotCategory', 
+    name: 'Hot Releases',
+    limit: 10,
+    styles: HotCategoryStyles,
+    get: funcNames.getHotCategory,
+    viewStyles: HotCategoryStyles.viewStyles,
+    listName: listNames.hotCategory,
+}]];

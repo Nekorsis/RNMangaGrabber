@@ -8,6 +8,15 @@ export const actionTypes = {
     CHANGE_MODULE_NAME: 'CHANGE_MODULE_NAME',
     SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
     SET_HOT_CATEGORY: 'SET_HOT_CATEGORY',
+    SET_ERROR: 'SET_ERROR',
+    SET_READING_CATEGORY: 'SET_READING_CATEGORY',
+};
+
+export const setError = (err) => {
+    return {
+        type: actionTypes.SET_ERROR,
+        payload: { err },
+    };
 };
 
 export const setMangaGenres = (mangaGenres) => {
@@ -56,6 +65,13 @@ export const setHotCategory = (moduleName, hotInfo) => {
     return {
         type: actionTypes.SET_HOT_CATEGORY,
         payload: { moduleName, hotInfo },
+    };
+};
+
+export const setReadingCategory = (moduleName, readingInfo) => {
+    return {
+        type: actionTypes.SET_READING_CATEGORY,
+        payload: { moduleName, readingInfo },
     };
 };
 

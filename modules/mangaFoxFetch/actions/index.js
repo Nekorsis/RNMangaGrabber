@@ -1,4 +1,4 @@
-import { mangaPath, searchPath, hotPath } from '../config/Network';
+import { mangaPath, searchPath, hotPath, readingNowPath } from '../config/Network';
 import { repeatMaxCounter, moduleName } from '../config/consts';
 import { 
     setMangaGenres, 
@@ -8,14 +8,13 @@ import {
     setMangaChapter, 
     setMangaChaptersList,
     setHotCategory,
+    setReadingCategory,
 } from '../../../actions/common';
 
 const imgSrcRegex = /img.+?src="(.+?)".+?<\/a>/;
 const nameRegex = /title="(.*?)"><img\s/;
 const linkRegex = /<a href="\/manga\/(.+?)\/"/;
 const itemScoreRegex = /<span class="item-score">(\d+\.\d+)<\/span>/;
-
-global.d = '';
 
 export const fetchHotCategoryAsync = () => {
     return async function(dispatch) {
@@ -28,6 +27,7 @@ export const fetchHotCategoryAsync = () => {
                 method: 'get',
                 headers: myHeaders
             });
+            
             const textifiedResponse = await response.text();
             const hotBlock = textifiedResponse.split('<li').reduce((accumulator, value) => {
                 const imgsrc = value.match(imgSrcRegex);
@@ -49,7 +49,45 @@ export const fetchHotCategoryAsync = () => {
             dispatch(setHotCategory(moduleName, hotBlock));
         }
         catch (err) {
-            console.log(err);
+            throw new Error(err);
+        }
+    };
+};
+
+export const fetchReadingCategoryAsync = () => {
+    return async function(dispatch) {
+        // eslint-disable-next-line no-undef
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'text/html');
+        try {
+            const response = await fetch(readingNowPath, {
+                mode: 'no-cors',
+                method: 'get',
+                headers: myHeaders
+            });
+            
+            const textifiedResponse = await response.text();
+            const hotBlock = textifiedResponse.split('<li').reduce((accumulator, value) => {
+                const imgsrc = value.match(imgSrcRegex);
+                const name = value.match(nameRegex);
+                const link = value.match(linkRegex);
+                const itemScore = value.match(itemScoreRegex);
+                if (!imgsrc || !name ) {
+                    return accumulator;
+                }
+                const block = { 
+                    img: imgsrc && imgsrc[1],
+                    name: name && name[1],
+                    link: link && mangaPath + link[1], 
+                    itemScore: itemScore && itemScore[1] 
+                };
+                accumulator = [...accumulator, block];
+                return accumulator;
+            }, []);
+            dispatch(setReadingCategory(moduleName, hotBlock));
+        }
+        catch (err) {
+            throw new Error(err);
         }
     };
 };
@@ -103,7 +141,6 @@ export const fetchMangaGenresAsync = (callback) => {
 export const fetchMangaListAsync = (url) => {
     return async function(dispatch) {
         dispatch(setLoadingState(true, 'mangaList'));
-        console.log('fetchMangaListAsync');
         // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
@@ -383,6 +420,7 @@ export default {
     fetchMangaGenresAsync, 
     fetchMangaListAsync, 
     fetchHotCategoryAsync,
+    fetchReadingCategoryAsync,
     searchMangaAsync, 
     fetchChapter, 
     getMangaChaptersList,

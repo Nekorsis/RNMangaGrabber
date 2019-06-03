@@ -7,33 +7,43 @@ import {
     View,
     ViewPagerAndroid,
     Image,
+    Modal,
+    TouchableHighlight,
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 
-// need to import actions or the app will crush /?/
-// import '../actions';
-import { fetchHotCategoryAsync } from '../actions';
+import { fetchHotCategoryAsync, fetchReadingCategoryAsync } from '../actions';
+import { setError } from '../actions/common';
 import { screenNames } from '../constants/consts';
 import homeStyles from './styles/Home';
 import MangaListBlock from '../components/common/MangaListBlock';
 import modules from '../modules';
 import right_arrow from '../assets/images/right_arrow.png';
+// import ErrorHoc from '../components/common/ErrorHoc';
+// import ModuleBlocks from '../components/common/ModuleBlocks';
 
 class Home extends React.Component {
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
         store: PropTypes.shape({}).isRequired,
         getHotCategory: PropTypes.func.isRequired,
+        getReadingCategory: PropTypes.func.isRequired,
+        defineError: PropTypes.func.isRequired,
     };
+
+    state = { modalVisible: true }
 
     keyExtractor = (item, index) => item.name || index.toString();
     
     openMangaSite = (mod) => {
         const { navigation: { navigate } } = this.props;
-        console.log(mod);
         navigate(screenNames.Site.name, mod);
+    }
+  
+    setModal(isVisible) {
+      this.setState({ modalVisible: isVisible });
     }
 
     getHot = moduleName => () => {
@@ -42,10 +52,8 @@ class Home extends React.Component {
     }
 
     getReading = moduleName => () => {
-      /*
       const { getReadingCategory } = this.props;
-      return getReadingCategory(moduleName);
-      */
+      getReadingCategory(moduleName);
     }
 
     // createSiteLinks = () => {
@@ -105,6 +113,7 @@ class Home extends React.Component {
     );
 
     createBlocks = () => {
+      console.log('createBlocks');
       const { store: { moduleName } } = this.props;
       const moduleBlock = modules[moduleName];
       const { blocksHorizontal, searchPath, mangaDirectoryUrl  } = moduleBlock;
@@ -131,11 +140,7 @@ class Home extends React.Component {
             </View>
           );
         }
-        return ( 
-          <View key={index}> 
-            {blocks} 
-          </View> 
-        );
+        return blocks;
       });
       return blocksHoriz;
     }
@@ -145,24 +150,70 @@ class Home extends React.Component {
       navigate(screenNames.ChaptersList.name, { manga, moduleName, isNovel });
     }
 
+    getStore = (listName, moduleName) => this.props.store[listName][moduleName];
+
+    onRequestClose = () => {
+      // const { defineError } = this.props;
+      console.log('onRequestClose');
+      // defineError(null);
+    }
+
     render() {
+      const { store: { err, moduleName }, defineError } = this.props;
+      const { modalVisible } = this.state;
+      
+
       // TODO only Android for now, implement nested scroll view for ios for the future
       // TODO change logic, move site selection to the side menu, viewpager will be only
       // for small blocks with manga of selected site
       // renderSite blocks like hot releases
       return (
-        <ViewPagerAndroid 
-          style={homeStyles.container}
-        >
-          {this.createBlocks() || false}
-        </ViewPagerAndroid>
+        err && modalVisible ? (
+          <View style={{marginTop: 22}}> 
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={!!err}
+              onRequestClose={this.onRequestClose}
+            >
+              <View style={{ marginTop: 22 }}>
+                <View>
+                  <Text>{err.toString()}</Text>
+                  <TouchableHighlight
+                    onPress={() => {
+                      this.setModal(false);
+                      defineError(null);
+                    }}
+                  >
+                    <Text>Hide Modal</Text>
+                  </TouchableHighlight>
+                </View>
+              </View>
+            </Modal>
+          </View>
+          ) : ( 
+            <ViewPagerAndroid 
+              style={homeStyles.container}
+            >
+              {this.createBlocks()}
+              {/* <ModuleBlocks 
+              moduleName={moduleName} 
+              homeStyles={homeStyles} 
+              getHot={this.getHot} 
+              getStore={this.getStore} 
+              navigation={this.props.navigation}
+              screenNames={screenNames}
+            /> */}
+            </ViewPagerAndroid>
+      )
       );
     }
 }
 
 const mapDispatchToProps = dispatch => ({
   getHotCategory: bindActionCreators(fetchHotCategoryAsync, dispatch),
-  // getReadingCategory:
+  defineError: bindActionCreators(setError, dispatch),
+  getReadingCategory: bindActionCreators(fetchReadingCategoryAsync, dispatch),
 });
 
 const mapStateToProps = state => ({

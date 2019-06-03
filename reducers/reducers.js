@@ -65,6 +65,14 @@ const appReducer = (state = initialState, action) => {
             const { moduleName, hotInfo } = action.payload;
             return { ...state, hotCategories: { ...state.hotCategories, [moduleName]: hotInfo } };
         }
+        case actionTypes.SET_READING_CATEGORY: {
+            const { moduleName, readingInfo } = action.payload;
+            return { ...state, readingNowCategories: { ...state.readingNowCategories, [moduleName]: readingInfo } };
+        }
+        case actionTypes.SET_ERROR: {
+            const { err } = action.payload;
+            return { ...state, err };
+        }
         default:
             break;
         }
