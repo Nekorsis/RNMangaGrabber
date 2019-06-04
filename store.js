@@ -18,5 +18,6 @@ export const initState = {
     moduleName: 'mangaFox',
     hotCategories: {},
     readingNowCategories: {},
+    recommendedCategories: {},
 };
 export default initState;

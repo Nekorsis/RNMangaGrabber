@@ -1,4 +1,4 @@
-import { mangaPath, searchPath, hotPath, readingNowPath } from '../config/Network';
+import { mangaPath, searchPath } from '../config/Network';
 import { repeatMaxCounter, moduleName } from '../config/consts';
 import { 
     setMangaGenres, 
@@ -7,8 +7,7 @@ import {
     saveChapterImages, 
     setMangaChapter, 
     setMangaChaptersList,
-    setHotCategory,
-    setReadingCategory,
+    setCategory,
 } from '../../../actions/common';
 
 const imgSrcRegex = /img.+?src="(.+?)".+?<\/a>/;
@@ -16,75 +15,45 @@ const nameRegex = /title="(.*?)"><img\s/;
 const linkRegex = /<a href="\/manga\/(.+?)\/"/;
 const itemScoreRegex = /<span class="item-score">(\d+\.\d+)<\/span>/;
 
-export const fetchHotCategoryAsync = () => {
+export const fetchCategoryAsync = (path, category, customParser) => {
     return async function(dispatch) {
         // eslint-disable-next-line no-undef
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'text/html');
+        let list;
         try {
-            const response = await fetch(hotPath, {
+            const response = await fetch(path, {
                 mode: 'no-cors',
                 method: 'get',
                 headers: myHeaders
             });
             
             const textifiedResponse = await response.text();
-            const hotBlock = textifiedResponse.split('<li').reduce((accumulator, value) => {
-                const imgsrc = value.match(imgSrcRegex);
-                const name = value.match(nameRegex);
-                const link = value.match(linkRegex);
-                const itemScore = value.match(itemScoreRegex);
-                if (!imgsrc || !name ) {
-                    return accumulator;
-                }
-                const block = { 
-                    img: imgsrc && imgsrc[1],
-                    name: name && name[1],
-                    link: link && mangaPath + link[1], 
-                    itemScore: itemScore && itemScore[1] 
-                };
-                accumulator = [...accumulator, block];
-                return accumulator;
-            }, []);
-            dispatch(setHotCategory(moduleName, hotBlock));
-        }
-        catch (err) {
-            throw new Error(err);
-        }
-    };
-};
 
-export const fetchReadingCategoryAsync = () => {
-    return async function(dispatch) {
-        // eslint-disable-next-line no-undef
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'text/html');
-        try {
-            const response = await fetch(readingNowPath, {
-                mode: 'no-cors',
-                method: 'get',
-                headers: myHeaders
-            });
+            console.log(customParser);
             
-            const textifiedResponse = await response.text();
-            const hotBlock = textifiedResponse.split('<li').reduce((accumulator, value) => {
-                const imgsrc = value.match(imgSrcRegex);
-                const name = value.match(nameRegex);
-                const link = value.match(linkRegex);
-                const itemScore = value.match(itemScoreRegex);
-                if (!imgsrc || !name ) {
+            if(customParser) {
+                list = customParser(textifiedResponse);
+            } else {
+                list = textifiedResponse.split('<li').reduce((accumulator, value) => {
+                    const imgsrc = value.match(imgSrcRegex);
+                    const name = value.match(nameRegex);
+                    const link = value.match(linkRegex);
+                    const itemScore = value.match(itemScoreRegex);
+                    if (!imgsrc || !name ) {
+                        return accumulator;
+                    }
+                    const block = { 
+                        img: imgsrc && imgsrc[1],
+                        name: name && name[1],
+                        link: link && mangaPath + link[1], 
+                        itemScore: itemScore && itemScore[1] 
+                    };
+                    accumulator = [...accumulator, block];
                     return accumulator;
-                }
-                const block = { 
-                    img: imgsrc && imgsrc[1],
-                    name: name && name[1],
-                    link: link && mangaPath + link[1], 
-                    itemScore: itemScore && itemScore[1] 
-                };
-                accumulator = [...accumulator, block];
-                return accumulator;
-            }, []);
-            dispatch(setReadingCategory(moduleName, hotBlock));
+                }, []);
+            }
+            dispatch(setCategory(moduleName, list, category));
         }
         catch (err) {
             throw new Error(err);
@@ -419,9 +388,8 @@ const fetchImage = ({ url, chapterUrl }) => {
 export default { 
     fetchMangaGenresAsync, 
     fetchMangaListAsync, 
-    fetchHotCategoryAsync,
-    fetchReadingCategoryAsync,
     searchMangaAsync, 
     fetchChapter, 
     getMangaChaptersList,
+    fetchCategoryAsync,
 };

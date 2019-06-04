@@ -65,6 +65,10 @@ const appReducer = (state = initialState, action) => {
             const { moduleName, hotInfo } = action.payload;
             return { ...state, hotCategories: { ...state.hotCategories, [moduleName]: hotInfo } };
         }
+        case actionTypes.SET_CATEGORY: {
+            const { moduleName, list, category } = action.payload;
+            return { ...state, [category]: { ...state[category], [moduleName]: list } };
+        }
         case actionTypes.SET_READING_CATEGORY: {
             const { moduleName, readingInfo } = action.payload;
             return { ...state, readingNowCategories: { ...state.readingNowCategories, [moduleName]: readingInfo } };

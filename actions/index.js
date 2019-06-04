@@ -12,6 +12,7 @@ const funcNames = {
     fetchMangaListAsync: 'fetchMangaListAsync',
     searchMangaAsync: 'searchMangaAsync',
     getMangaChaptersList: 'getMangaChaptersList',
+    fetchCategoryAsync: 'fetchCategoryAsync',
     fetchChapter: 'fetchChapter',
     fetchHotCategoryAsync: 'fetchHotCategoryAsync',
     fetchReadingCategoryAsync: 'fetchReadingCategoryAsync',
@@ -76,15 +77,9 @@ export const fetchMangaGenresAsync = (name) => {
     };
 };
 
-export const fetchHotCategoryAsync = (name) => {
+export const fetchCategoryAsync = (name, path, category, customParser) => {
     return function(dispatch, getState) {
-        return funcCaller(funcNames.fetchHotCategoryAsync, getState, name, dispatch);
-    };
-};
-
-export const fetchReadingCategoryAsync = (name) => {
-    return function(dispatch, getState) {
-        return funcCaller(funcNames.fetchReadingCategoryAsync, getState, name, dispatch);
+        return funcCaller(funcNames.fetchCategoryAsync, getState, name, dispatch, path, category, customParser);
     };
 };
 

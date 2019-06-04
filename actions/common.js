@@ -7,9 +7,8 @@ export const actionTypes = {
     SAVE_CHAPTER_IMAGES: 'SAVE_CHAPTER_IMAGES',
     CHANGE_MODULE_NAME: 'CHANGE_MODULE_NAME',
     SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
-    SET_HOT_CATEGORY: 'SET_HOT_CATEGORY',
     SET_ERROR: 'SET_ERROR',
-    SET_READING_CATEGORY: 'SET_READING_CATEGORY',
+    SET_CATEGORY: 'SET_CATEGORY',
 };
 
 export const setError = (err) => {
@@ -61,17 +60,10 @@ export const setMangaChaptersList = (mangaChaptersList) => {
     };
 };
 
-export const setHotCategory = (moduleName, hotInfo) => {
+export const setCategory = (moduleName, list, category) => {
     return {
-        type: actionTypes.SET_HOT_CATEGORY,
-        payload: { moduleName, hotInfo },
-    };
-};
-
-export const setReadingCategory = (moduleName, readingInfo) => {
-    return {
-        type: actionTypes.SET_READING_CATEGORY,
-        payload: { moduleName, readingInfo },
+        type: actionTypes.SET_CATEGORY,
+        payload: { moduleName, list, category },
     };
 };
 
