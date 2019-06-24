@@ -43,6 +43,9 @@ class Chapter extends React.Component {
         return (isNovel ? <NovelReader text={imagesArray} /> : <ImageViewer imageUrls={imagesArray} />);
     }
 
+    renderNavigation = () => {
+    }
+
     render() {
         const { store: { imagesInfo: { isLoading, err } } } = this.props;
         if (isLoading && err) {
@@ -57,7 +60,10 @@ class Chapter extends React.Component {
         return (
             <View style={styles.container}>
                 {isLoading ? 
-                <ActivityIndicator size="large" color="#0000ff" />
+                <View>
+                    <ActivityIndicator size="large" color="#0000ff" />
+
+                </View>
                 : this.renderCorrectView()
                 }
             </View>

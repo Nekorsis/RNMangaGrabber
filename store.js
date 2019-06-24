@@ -5,7 +5,7 @@ export const initState = {
         list: null,
     },
     mangaGenres: null,
-    mangaChapters: { isLoading: true, mangaChaptersList: null },
+    mangaChapters: { isLoading: true, mangaChaptersList: null, progressBar: null },
     isLoading: false,
     imagesInfo: {
         isLoading: true,

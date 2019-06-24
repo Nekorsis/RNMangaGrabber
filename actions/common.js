@@ -9,7 +9,12 @@ export const actionTypes = {
     SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
     SET_ERROR: 'SET_ERROR',
     SET_CATEGORY: 'SET_CATEGORY',
+    SET_BAR_PROGRESS: 'SET_BAR_PROGRESS',
+    // SET_IMAGE_COUNT
 };
+
+// setBarProgress,
+// setImageCount,
 
 export const setError = (err) => {
     return {

@@ -102,11 +102,10 @@ class Home extends React.Component {
 
     // getStore = (listName, moduleName) => this.props.store[listName][moduleName];
 
-    // onRequestClose = () => {
-    //   const { defineError } = this.props;
-    //   console.log('onRequestClose');
-    //   defineError(null);
-    // }
+    onRequestClose = () => {
+      const { defineError } = this.props;
+      defineError(null);
+    }
 
     render() {
       const { store: { err }, defineError } = this.props;
@@ -120,7 +119,7 @@ class Home extends React.Component {
       return (
         err && modalVisible ? (
           <View> 
-            <Modal
+            {/* <Modal
               animationType="slide"
               transparent={false}
               visible={!!err}
@@ -139,7 +138,7 @@ class Home extends React.Component {
                   </TouchableHighlight>
                 </View>
               </View>
-            </Modal>
+            </Modal> */}
           </View>
           ) : ( 
             <ViewPagerAndroid 
