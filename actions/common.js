@@ -9,12 +9,9 @@ export const actionTypes = {
     SET_LOADING_CHAPTER: 'SET_LOADING_CHAPTER',
     SET_ERROR: 'SET_ERROR',
     SET_CATEGORY: 'SET_CATEGORY',
-    SET_BAR_PROGRESS: 'SET_BAR_PROGRESS',
-    // SET_IMAGE_COUNT
+    SET_PROGRESS_BAR: 'SET_PROGRESS_BAR',
+    SET_IMAGE_COUNT: 'SET_IMAGE_COUNT',
 };
-
-// setBarProgress,
-// setImageCount,
 
 export const setError = (err) => {
     return {
@@ -80,4 +77,18 @@ export const rejectChapterLoad = () => {
             dispatch(setMangaChapter(null));
         }
     }; 
+};
+
+export const setImageCount = (imageCount) => {
+    return {
+        type: actionTypes.SET_IMAGE_COUNT,
+        payload: { imageCount },
+    };
+};
+
+export const setBarProgress = (progress) => {
+    return {
+        type: actionTypes.SET_PROGRESS_BAR,
+        payload: { progress },
+    };
 };

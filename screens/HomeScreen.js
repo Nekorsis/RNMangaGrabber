@@ -71,7 +71,7 @@ class Home extends React.Component {
           const { styles, name: blockName, listName, viewStyles, path, customParser } = item;
           const { store: { [listName] : { [moduleName] : list } } } = this.props;
           const getList = this.getCategory(moduleName, path, listName, customParser);
-          return this.createBlock({ viewStyles, category: { styles, blockName }, list, getList, key: blockName });
+          return this.createBlock({ viewStyles, category: { styles, blockName }, list, getList, key: blockName, moduleName });
         });
         if(index === 0) {
           return (

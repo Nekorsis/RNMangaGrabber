@@ -3,6 +3,7 @@ import {
     setMangaChapter,
     setError,
     actionTypes,
+    setBarProgress,
 } from './common';
 
 
@@ -69,6 +70,12 @@ const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
     }
 
     return promisedFunc;
+};
+
+export const loadingBarInitWrapper = async (func, ...props) => {
+    setBarProgress(0);
+    await func(props);
+    setBarProgress(0);
 };
 
 export const fetchMangaGenresAsync = (name) => {

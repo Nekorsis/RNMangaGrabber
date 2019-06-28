@@ -31,16 +31,15 @@ class ChaptersList extends React.Component {
         }
     }
 
-    openChapter = (chapter) => {
+    openChapter = (chapter, index) => {
         const { navigation: { navigate, state: { params: { moduleName, ...other } = {} } } } =  this.props;
-        navigate(screenNames.Chapter.name, { chapter, moduleName, ...other });
+        navigate(screenNames.Chapter.name, { chapter, moduleName, index, ...other });
     }
 
     keyExtractor = (item, index) => item.name || index.toString();
 
     downloadAllNovel = () => {
       const { navigation: { state: { params: { moduleName } = {} } }, store: { mangaChapters: { mangaChaptersList } = {} }, downloadAll } = this.props;
-      console.log(moduleName);
       downloadAll(moduleName, mangaChaptersList);
     }
 
@@ -63,9 +62,9 @@ class ChaptersList extends React.Component {
                   <FlatList
                     data={mangaChaptersList}
                     keyExtractor={this.keyExtractor}
-                    renderItem={({item}) => {
+                    renderItem={({ item, index }) => {
                         return (
-                          <TouchableOpacity style={styles.touchableOpacity} onPress={() => this.openChapter(item)}>
+                          <TouchableOpacity style={styles.touchableOpacity} onPress={() => this.openChapter(item, index)}>
                             <View style={styles.itemTextContainer}>
                               <Text style={styles.itemText}>{`${item.name}`}</Text>
                             </View>

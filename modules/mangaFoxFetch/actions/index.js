@@ -8,8 +8,8 @@ import {
     setMangaChapter, 
     setMangaChaptersList,
     setCategory,
-    // setBarProgress,
-    // setImageCount,
+    setBarProgress,
+    setImageCount,
 } from '../../../actions/common';
 
 const imgSrcRegex = /img.+?src="(.+?)".+?<\/a>/;
@@ -230,6 +230,7 @@ export const getMangaChaptersList = (url) => {
 export const fetchChapter = (url) => {
     return (dispatch, getState) => {
         try {
+        dispatch(setLoadingState(true, 'imagesInfo'));
         let cancel;
         let innerPromise;
         let { appReducer: { chapterPromise } } = getState();
@@ -239,6 +240,7 @@ export const fetchChapter = (url) => {
         }
         const chapterObject = { promise: new Promise(async (resolve) => {
             cancel = (reason) => {
+                dispatch(setBarProgress(0));
                 if (innerPromise) {
                     innerPromise.cancel('Rejected by another request');
                 }
@@ -247,7 +249,6 @@ export const fetchChapter = (url) => {
             };
             // eslint-disable-next-line no-undef
             const myHeaders = new Headers();
-            dispatch(setLoadingState(true, 'imagesInfo'));
             myHeaders.append('Content-Type', 'text/html');
             const respText = await (await fetch(url,{
                 mode: 'no-cors',
@@ -258,60 +259,56 @@ export const fetchChapter = (url) => {
             const chapterId = respText.match(/chapterid[\s\S]=(.*?);/);
             const content = respText.match(/meta name="og:url" content="(.*?)"/);
             const changedContent = content && content[1].replace('mangafox.me','fanfox.net');
-            const imageCount = respText.match(/var\Simagecount=(.*?);/);
-            dispatch(setImageCount(imageCount));
-            // const chapterCount = getChapterCount(changedContent, myHeaders);
+            const imageCount = respText.match(/var imagecount=(.*?);/);
+            dispatch(setImageCount(imageCount && imageCount[1]));
             innerPromise = recursiveTimeoutFetchChapter({ url, chapterId, changedContent, dispatch });
             innerPromise.promise.then((info) => {
                 dispatch(setMangaChapter(null));
                 if (info.err) {
+                    console.log('err info');
                     dispatch(saveChapterImages({ err: info.err }));
                     resolve(info);
+                    return;
                 }
                 if (info) {
                     dispatch(saveChapterImages(info));
+                    dispatch(setBarProgress(0));
                     resolve(info);
                 }
             }).catch((err) => { 
-                console.log('reject innerPromise');
+                console.log('catch innerPromise');
                 dispatch(saveChapterImages({ err }));
             });
         }), cancel};
         dispatch(setMangaChapter(chapterObject));
     } catch(err) {
-        console.log('reject');
+        console.log('catch fetchChapter');
         dispatch(saveChapterImages({ err }));
     }
     };
 };
 
-// const getChapterCount = async (url, myHeaders) => {
-//     const respText = await (await fetch(url,{
-//         mode: 'no-cors',
-//         method: 'get',
-//         headers: myHeaders,
-//     })).text();
-//     console.log(respText);
-// };
-
 const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent, dispatch }) => {
     let timeout;
     let cancel;
+    let isRejected = false;
     return { promise: new Promise((resolve, reject) => {
     let images = [];
     cancel = (reason) => {
-        clearTimeout(timeout);
+        isRejected = true;
+        console.log('reason recursiveTimeoutFetchChapter', reason);
         reject(reason);
     };
     let accumulator = [];
     let page = 1;
+    dispatch(setBarProgress(page));
+    /* TODO implement promise multiple loading Promise.all [image, image, ...images] without delay can be blocked*/
     timeout = () => {
-        try {
-        setTimeout(async () => {
+        return setTimeout(async () => {
+            try {
             const chapterUrl = `${changedContent}chapterfun.ashx?cid=${chapterId ? chapterId[1] : ''}&page=${page}&key=`;
             images = await fetchImage({ url, chapterUrl });
             if(images && images.err) {
-                clearTimeout(timeout);
                 reject(images.err);
                 return;
             }
@@ -330,19 +327,20 @@ const recursiveTimeoutFetchChapter = ({ url, chapterId, changedContent, dispatch
             }
             accumulator = [...accumulator, ...preparedImages];
             page += 1;
-            // page % 4 === 0 && dispatch(saveChapterImages(accumulator));
+            if(isRejected) {
+                return;
+            }
             dispatch(setBarProgress(page));
             timeout();
-
+            } catch (err) {
+                isRejected = true;
+                reject(err);
+            }
         }, 100);
-    } catch (err) {
-        clearTimeout(timeout);
-        reject(err);
-        }
     };
     timeout(); 
 }).catch((err) => {
-    clearTimeout(timeout);
+    isRejected = true;
     return { err };
 }), cancel };
 };
