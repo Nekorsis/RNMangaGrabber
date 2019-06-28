@@ -59,6 +59,7 @@ export default class ModuleBlocks extends React.Component {
     });
     if(index === 0) {
       return (
+        // eslint-disable-next-line react/no-array-index-key
         <View style={homeStyles.siteContainer} key={index}>
           <TouchableOpacity onPress={() => { this.openMangaSite({ moduleName, searchPath, mangaDirectoryUrl }); }} style={homeStyles.touchableOpacity}>
             <Text style={homeStyles.blockName}>

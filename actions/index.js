@@ -3,6 +3,7 @@ import {
     setMangaChapter,
     setError,
     actionTypes,
+    setBarProgress,
 } from './common';
 
 
@@ -12,6 +13,7 @@ const funcNames = {
     fetchMangaListAsync: 'fetchMangaListAsync',
     searchMangaAsync: 'searchMangaAsync',
     getMangaChaptersList: 'getMangaChaptersList',
+    fetchCategoryAsync: 'fetchCategoryAsync',
     fetchChapter: 'fetchChapter',
     fetchHotCategoryAsync: 'fetchHotCategoryAsync',
     fetchReadingCategoryAsync: 'fetchReadingCategoryAsync',
@@ -70,21 +72,21 @@ const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
     return promisedFunc;
 };
 
+export const loadingBarInitWrapper = async (func, ...props) => {
+    setBarProgress(0);
+    await func(props);
+    setBarProgress(0);
+};
+
 export const fetchMangaGenresAsync = (name) => {
     return function(dispatch, getState) {
         return funcCaller(funcNames.fetchMangaGenresAsync, getState, name, dispatch);
     };
 };
 
-export const fetchHotCategoryAsync = (name) => {
+export const fetchCategoryAsync = (name, path, category, customParser) => {
     return function(dispatch, getState) {
-        return funcCaller(funcNames.fetchHotCategoryAsync, getState, name, dispatch);
-    };
-};
-
-export const fetchReadingCategoryAsync = (name) => {
-    return function(dispatch, getState) {
-        return funcCaller(funcNames.fetchReadingCategoryAsync, getState, name, dispatch);
+        return funcCaller(funcNames.fetchCategoryAsync, getState, name, dispatch, path, category, customParser);
     };
 };
 

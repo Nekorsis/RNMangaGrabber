@@ -5,7 +5,7 @@ export const initState = {
         list: null,
     },
     mangaGenres: null,
-    mangaChapters: { isLoading: true, mangaChaptersList: null },
+    mangaChapters: { isLoading: true, mangaChaptersList: null, progressBar: null, imageCount: null },
     isLoading: false,
     imagesInfo: {
         isLoading: true,
@@ -18,5 +18,6 @@ export const initState = {
     moduleName: 'mangaFox',
     hotCategories: {},
     readingNowCategories: {},
+    recommendedCategories: {},
 };
 export default initState;

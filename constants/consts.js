@@ -14,4 +14,5 @@ export const funcNames = {
   export const listNames = {
     hotCategory: 'hotCategories',
     readingNow: 'readingNowCategories',
+    recommended: 'recommendedCategories',
   };
