@@ -130,9 +130,9 @@ export const deleteMangaChapter = (chapterPromise) => {
 };
 
 
-export const fetchChapter = (url, name) => {
+export const fetchChapter = (url, name, index, preload, withoutProgress) => {
     return (dispatch, getState) => {
-        return funcCaller(funcNames.fetchChapter, getState, name, dispatch, url);
+        return funcCaller(funcNames.fetchChapter, getState, name, dispatch, url, index, preload, withoutProgress);
     };
 };
 

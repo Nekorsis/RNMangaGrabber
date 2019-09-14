@@ -41,10 +41,10 @@ export const setMangaList = (list) => {
     };
 };
 
-export const saveChapterImages = (imagesArray) => {
+export const saveChapterImages = (imagesArray, index, preload) => {
     return {
         type: actionTypes.SAVE_CHAPTER_IMAGES,
-        payload: { imagesArray },
+        payload: { imagesArray, index, preload },
     };
 };
 

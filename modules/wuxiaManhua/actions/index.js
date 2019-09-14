@@ -36,8 +36,6 @@ export const fetchAll = (mangaChaptersList) => {
             return fetchChapterMultipleImplement(index.link)(dispatch, getState).promise;
         })
         , Promise.resolve());
-        
-        console.log(accumulator);
     };
 
 
