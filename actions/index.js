@@ -31,7 +31,6 @@ const modulesReducersActions = Object.values(modules).reduce((accumulator, mod) 
 
 const funcCaller = (funcName, getState, name, dispatch, ...extra) => {
     const moduleName = name || getState().appReducer.moduleName;
-    // TODO simplify
     if (!(name || moduleName)) {
         console.log('need to run default parser funcCaller for func: ' + funcName);
         return;
@@ -144,16 +143,16 @@ export const fetchAll = (name, mangaChaptersList) => {
 
 export const rejectChapterLoad = () => {
     return (dispatch, getState) => {
-        // const { appReducer: { chapterPromise, preloadChapterPromise } } = getState();
-        // console.log('chapter', chapterPromise);
-        // if (chapterPromise) {
-        //     chapterPromise.cancel('Rejected by exit from the chapter reader');
-        //     dispatch(setMangaChapter(null));
-        // }
-        // console.log('preload', preloadChapterPromise);
-        // if (preloadChapterPromise) {
-        //     preloadChapterPromise.cancel('Rejected preloadChapterPromise by exit from the chapter reader');
-        //     dispatch(setMangaChapter(null, true));
-        // }
+        const { appReducer: { chapterPromise, preloadChapterPromise } } = getState();
+        console.log('chapter', chapterPromise);
+        if (chapterPromise) {
+            chapterPromise.cancel('Rejected by exit from the chapter reader');
+            dispatch(setMangaChapter(null));
+        }
+        console.log('preload', preloadChapterPromise);
+        if (preloadChapterPromise) {
+            preloadChapterPromise.cancel('Rejected preloadChapterPromise by exit from the chapter reader');
+            dispatch(setMangaChapter(null, true));
+        }
     }; 
 };

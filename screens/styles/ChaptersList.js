@@ -24,4 +24,21 @@ export default StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
     },
+    genreTextContainer: {
+        maxWidth: '90%',
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    genre: {
+        paddingLeft: 5,
+        paddingRight: 2,
+        marginLeft: 5,
+        marginTop: 5,
+        borderWidth: 2,
+        borderColor: vars.brownWhite,
+        borderRadius: 7,
+    },
+    description: {
+    },
 });

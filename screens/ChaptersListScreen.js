@@ -17,6 +17,12 @@ import { getMangaChaptersList, fetchAll } from '../actions';
 import { screenNames } from '../constants/consts';
 import styles from './styles/ChaptersList';
 
+const DESCRIPTION_LENGTH = 1002;
+
+// TODO сделать описание по кнопке, можно респонсив менять разрешение картинки через transition/animation, чтобы выезжала красиво.
+// текст описания сделать более читабельным. добавить more поддержку.
+// TODO Проработать ссылки жанров. Должны перенаправлять на страницу фильтра, с выбранными жанрами.
+// Разобраться с ломающимся списком мангки выбор с блока --> назад --> переход на страницу сайта --> пропадает список манги
 class ChaptersList extends React.Component {
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
@@ -65,11 +71,21 @@ class ChaptersList extends React.Component {
                   )}
                   { 
                     mangaInfo && mangaInfo.description && 
-                    <Text style={styles.itemText}>{`${mangaInfo.description}`}</Text>
+                    <View style={styles.itemTextContainer}>
+                      <Text style={styles.desctiption}>
+                        {`${mangaInfo.description.slice(0, DESCRIPTION_LENGTH)}${mangaInfo.description.length > DESCRIPTION_LENGTH ? ' more...' : ''}`}
+                      </Text>
+                    </View>
                   }
                   { 
-                    mangaInfo && mangaInfo.genresArray && 
-                    mangaInfo.genresArray.map(item => <Text key={item.title} style={styles.itemText}>{`${item.title}`}</Text>)
+                    mangaInfo && mangaInfo.genresArray &&
+                    <View style={styles.genreTextContainer}>
+                    {mangaInfo.genresArray.map(item => (
+                      <View key={item.title} style={styles.itemTextContainer}>
+                        <Text style={styles.genre}>{`${item.title}`}</Text>
+                      </View>
+                    ))}
+                    </View>
                   }
                     <FlatList
                       data={mangaChaptersList}

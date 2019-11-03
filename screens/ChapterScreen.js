@@ -11,7 +11,6 @@ import * as Progress from 'react-native-progress';
 import { fetchChapter, rejectChapterLoad } from '../actions';
 import { setLoadingState } from '../actions/common';
 import { screenNames } from '../constants/consts';
-import NovelReader from '../components/common/NovelReader';
 import styles from './styles/Chapter';
 
 class Header extends React.Component {
@@ -112,12 +111,11 @@ class Chapter extends React.Component {
         const { navigation: { state: { params: { isNovel = false } = {} } }, images: { imagesList } } =  this.props;
         const { list, preload } = this.state;
         const imageUrls = preload ? list : imagesList;
-        console.log(!!imageUrls);
         return (
         <ImageViewer
             saveToLocalByLongPress={false} 
             onArrayEnd={this.onLastImage} 
-            imageUrls={imageUrls || []} 
+            imageUrls={imageUrls} 
         />
         );
     }
