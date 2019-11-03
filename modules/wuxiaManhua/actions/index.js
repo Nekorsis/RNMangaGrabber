@@ -20,7 +20,6 @@ const bodyNovel = {
 };
 
 export const fetchAll = (mangaChaptersList) => {
-    
     return async function(dispatch, getState) {
         let accumulator = [];
         // const element = await fetchChapter(mangaChaptersList[6].link)(dispatch, getState).promise;
@@ -37,11 +36,6 @@ export const fetchAll = (mangaChaptersList) => {
         })
         , Promise.resolve());
     };
-
-
-    
-
-
 };
 
 export const fetchHotCategoryAsync = () => {

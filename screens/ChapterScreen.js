@@ -43,19 +43,26 @@ class Chapter extends React.Component {
 
     shouldComponentUpdate(nextProps) {
         const { imagesPreload: { imagesPreviewList: prevPreviewList }, images: prevImages, navigation, changeLoadingState } = this.props;
-        const { imagesPreload: { imagesPreviewList: nextPreviewList }, images,
-        navigation: { state: { params: { chapter } = {} } } } = nextProps;
+        const { 
+            imagesPreload: { imagesPreviewList: nextPreviewList }, 
+            images,
+            navigation: { state: { params: { chapter } = {} } },
+        } = nextProps;
         if (prevPreviewList !== nextPreviewList) {
             return false;
         }
-        if (this.state.preload === true && (chapter === navigation.state.params.chapter) && JSON.stringify(images) === JSON.stringify(prevImages) ) {
-            return false;
-        }
-        // if (this.state.preload && 
-        //     (images.imagesList[0] === prevImages.imagesList[0]) 
-        //     && (chapter === navigation.state.params.chapter)) {
+        // if ((chapter === navigation.state.params.chapter) && JSON.stringify(images) === JSON.stringify(prevImages)) {
         //     return false;
         // }
+
+        if ((chapter === navigation.state.params.chapter) && 
+            images.isLoading === prevImages.isLoading && images.progressBar === prevImages.progressBar) {
+                const diffImages = images.imagesList && images.imagesList.find((image, index) => image.url !== (prevImages.imagesList &&
+                prevImages.imagesList[index] && prevImages.imagesList[index].url));
+                if (!diffImages) {
+                    return false;
+                }
+        }
         return true;
     }
 
@@ -111,24 +118,25 @@ class Chapter extends React.Component {
         const { list, preload } = this.state;
         const imagesArray = preload ? list : imagesList;
         console.log('tick');
+        console.log('promise leak, chapter return null and works multiple fetches');
         return (
             isNovel ? 
                 <NovelReader text={imagesArray} /> : 
-                <ImageViewer onEndImagesArray={this.onLastImage} imageUrls={imagesArray} />
+                <ImageViewer saveToLocalByLongPress={false} onArrayEnd={this.onLastImage} imageUrls={imagesArray} />
             );
     }
 
     render() {
         const { images: { isLoading, progressBar }, err } = this.props;
-        if (isLoading && err) {
-            return (
-              <View> 
-                <Text> 
-                  {err.toString()} 
-                </Text>
-              </View>
-            );
-        }
+        // if (isLoading && err) {
+        //     return (
+        //       <View> 
+        //         <Text> 
+        //           {err.toString()} 
+        //         </Text>
+        //       </View>
+        //     );
+        // }
         return (
             <View style={styles.container}>
                 {isLoading ? 

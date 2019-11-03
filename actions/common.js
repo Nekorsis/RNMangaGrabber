@@ -48,10 +48,10 @@ export const saveChapterImages = (imagesArray, index, preload) => {
     };
 };
 
-export const setMangaChapter = (chapterPromise) => {
+export const setMangaChapter = (chapterPromise, preload) => {
     return {
         type: actionTypes.SET_LOADING_CHAPTER,
-        payload: { chapterPromise },
+        payload: { chapterPromise, preload },
     };
 };
 
@@ -71,10 +71,13 @@ export const setCategory = (moduleName, list, category) => {
 
 export const rejectChapterLoad = () => {
     return (dispatch, getState) => {
-        const { appReducer: { chapterPromise } } = getState();
+        const { appReducer: { chapterPromise, preloadChapterPromise } } = getState();
         if (chapterPromise) {
             chapterPromise.cancel('Rejected by exit from the chapter reader');
             dispatch(setMangaChapter(null));
+        }
+        if (preloadChapterPromise) {
+            preloadChapterPromise.cancel('Rejected preloadChapterPromise by exit from the chapter reader');
         }
     }; 
 };

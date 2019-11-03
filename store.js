@@ -25,6 +25,7 @@ export const initState = {
         filterUrl: null,
     },
     chapterPromise: null,
+    preloadChapterPromise: null,
     moduleName: 'mangaFox',
     hotCategories: {},
     readingNowCategories: {},

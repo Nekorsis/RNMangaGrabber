@@ -49,32 +49,32 @@ class ChaptersList extends React.Component {
             isLoading ? 
               <ActivityIndicator /> 
             : (
-              <React.Fragment>
-                {/* <View>
-                  <Button
-                    onPress={this.downloadAllNovel}
-                    title="Download All"
-                    color="#841584"
-                    accessibilityLabel="Learn more about this purple button"
-                  />
-                </View> */}
-                <View style={styles.container}>
-                  <FlatList
-                    data={mangaChaptersList}
-                    keyExtractor={this.keyExtractor}
-                    renderItem={({ item, index }) => {
-                        return (
-                          <TouchableOpacity style={styles.touchableOpacity} onPress={() => this.openChapter(item, index)}>
-                            <View style={styles.itemTextContainer}>
-                              <Text style={styles.itemText}>{`${item.name}`}</Text>
-                            </View>
-                          </TouchableOpacity>
-                        );
-                    }}
-                  />
-                </View>
-              </React.Fragment>
-));
+                <React.Fragment>
+                  {/* <View>
+                    <Button
+                      onPress={this.downloadAllNovel}
+                      title="Download All"
+                      color="#841584"
+                      accessibilityLabel="download All"
+                    />
+                  </View> */}
+                  <View style={styles.container}>
+                    <FlatList
+                      data={mangaChaptersList}
+                      keyExtractor={this.keyExtractor}
+                      renderItem={({ item, index }) => {
+                          return (
+                            <TouchableOpacity style={styles.touchableOpacity} onPress={() => this.openChapter(item, index)}>
+                              <View style={styles.itemTextContainer}>
+                                <Text style={styles.itemText}>{`${item.name}`}</Text>
+                              </View>
+                            </TouchableOpacity>
+                          );
+                      }}
+                    />
+                  </View>
+                </React.Fragment>
+              ));
     }
 }
 

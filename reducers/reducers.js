@@ -65,8 +65,8 @@ const appReducer = (state = initialState, action) => {
             }
         }
         case actionTypes.SET_LOADING_CHAPTER: {
-            const { chapterPromise } = action.payload;
-            return { ...state, chapterPromise };
+            const { chapterPromise, preload } = action.payload;
+            return { ...state, [preload ? 'preloadChapterPromise' :  'chapterPromise'] : chapterPromise };
         }
         case actionTypes.SET_CHAPTERS_LIST: {
             const { mangaChaptersList } = action.payload;
@@ -122,7 +122,6 @@ const navReducer = (state = initialNavigatorState, action) => {
 const reducer = combineReducers({
     appReducer,
     nav: navReducer,
-    // ...modulesReducersObj,
 });
 
 export default reducer;

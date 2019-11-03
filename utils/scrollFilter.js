@@ -62,10 +62,6 @@ export default class ScrollFilter {
             this.setPage(currentPage);
         }
         const { filter: { genres, template, page } } = this;
-        // if (genres.length <= 0) {
-        //     return this.mangaDirectoryUrl + `/${page}.html`;
-        // }
         return this.searchPath;
-        // return searchPath + `${page > 1 ? `${template.page}${page}&` : ''}${template.title}&${template.genres}${this.correctFilterGenreCount(genres)}&st=0&sort=&stype=1&name_method=cw&name=&author_method=cw&author=&artist_method=cw&artist=&type=&rating_method=eq&rating=&released_method=eq&released=`;
     };
 }

@@ -232,7 +232,7 @@ export const fetchChapter = (url, index, preload, withoutProgress = false) => {
         try {
         let cancel;
         let innerPromise;
-        let { appReducer: { chapterPromise } } = getState();
+        let { appReducer: { [preload ? 'preloadChapterPromise' :  'chapterPromise'] : chapterPromise } } = getState();
         if (chapterPromise) {
             chapterPromise.cancel('Rejected by another request');
             dispatch(setMangaChapter(null));
@@ -268,7 +268,7 @@ export const fetchChapter = (url, index, preload, withoutProgress = false) => {
             innerPromise.promise.then((info) => {
                 dispatch(setMangaChapter(null));
                 if (info.err) {
-                    console.log('err info');
+                    console.log('err info', info.err);
                     dispatch(saveChapterImages({ err: info.err }));
                     resolve(info);
                     return;
@@ -285,7 +285,7 @@ export const fetchChapter = (url, index, preload, withoutProgress = false) => {
                 dispatch(saveChapterImages({ err }));
             });
         }), cancel};
-        dispatch(setMangaChapter(chapterObject));
+        dispatch(setMangaChapter(chapterObject, preload));
     } catch(err) {
         console.log('catch fetchChapter');
         dispatch(saveChapterImages({ err }));
@@ -366,7 +366,7 @@ const fetchImage = ({ url, chapterUrl }) => {
             method: 'GET',
             headers: blobHeaders,
         });
-        if (blobResp._bodyText.length <= 0) {
+        if (blobResp.status !== 200) {
             let interval;
             let repeatCounter = 0;
             blobResp = await new Promise((fetchResolve) => {
@@ -386,12 +386,13 @@ const fetchImage = ({ url, chapterUrl }) => {
             });
             clearInterval(interval);
         }
-        eval(blobResp._bodyText);
+        const text = await blobResp.text();
+        eval(text);
         const regex = /http:.*/;
         // eval defines d var, webpack likes to dcompress vars and we can't use d right away, so i define array 
         // eslint-disable-next-line no-undef
-        const arrrr = d;
-        const fixedImgArray = arrrr.map((imgsrc) => {
+        const extraImageArray = d;
+        const fixedImgArray = extraImageArray.map((imgsrc) => {
             return { url: imgsrc.match(regex) ? imgsrc : 'http:' + imgsrc };
         });
         resolve(fixedImgArray);
