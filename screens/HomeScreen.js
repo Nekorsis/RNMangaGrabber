@@ -100,15 +100,13 @@ class Home extends React.Component {
       navigate(screenNames.ChaptersList.name, { manga, moduleName, isNovel });
     }
 
-    // getStore = (listName, moduleName) => this.props.store[listName][moduleName];
-
     onRequestClose = () => {
       const { defineError } = this.props;
       defineError(null);
     }
 
     render() {
-      const { store: { err }, defineError } = this.props;
+      const { store: { err } } = this.props;
       const { modalVisible } = this.state;
       
 
@@ -119,87 +117,16 @@ class Home extends React.Component {
       return (
         err && modalVisible ? (
           <View> 
-            {/* <Modal
-              animationType="slide"
-              transparent={false}
-              visible={!!err}
-              onRequestClose={this.onRequestClose}
-            >
-              <View>
-                <View>
-                  <Text>{err.toString()}</Text>
-                  <TouchableHighlight
-                    onPress={() => {
-                      this.setModal(false);
-                      defineError(null);
-                    }}
-                  >
-                    <Text>Hide Modal</Text>
-                  </TouchableHighlight>
-                </View>
-              </View>
-            </Modal> */}
           </View>
           ) : ( 
             <ViewPagerAndroid 
               style={homeStyles.container}
             >
               {this.createBlocks()}
-              {/* <ModuleBlocks 
-              moduleName={moduleName} 
-              homeStyles={homeStyles} 
-              getHot={this.getHot} 
-              getStore={this.getStore} 
-              navigation={this.props.navigation}
-              screenNames={screenNames}
-            /> */}
             </ViewPagerAndroid>
       )
       );
     }
-     // createSiteLinks = () => {
-      
-    //   // change and make this code for blocks of manga and other stuff, sites move to the side menu
-    //     return modules.map((mod, index) => {
-    //       const { moduleName, isNovel, blocksMetadata: { hotCategory, readingNow } } = mod;
-
-    //       const { store: { hotCategories: { [moduleName] : hotInfo }, readingNowCategories: { [moduleName]: readingNowInfo } } } = this.props;
-    //         return (
-    //           // eslint-disable-next-line react/no-array-index-key
-              // <View style={homeStyles.siteContainer} key={index}>
-              //   <TouchableOpacity onPress={() => { this.openMangaSite(mod); }} style={homeStyles.touchableOpacity}>
-              //     <Text style={homeStyles.blockName}>
-              //       {moduleName.toUpperCase()}
-              //     </Text>
-              //   </TouchableOpacity>
-    //             {hotCategory &&  
-    //               (
-    //               <View style={homeStyles.hotRelease}>
-    //                 <MangaListBlock 
-    //                   blockName={hotCategory.name}
-    //                   styles={hotCategory.styles}
-    //                   list={hotInfo} 
-    //                   getList={this.getHot(moduleName)} 
-    //                   openMangaLink={this.openMangaLink(moduleName, isNovel)}
-    //                 />
-    //               </View>
-    //               )}
-    //             {readingNow &&
-    //               (
-    //               <View style={homeStyles.hotRelease}>
-    //                 <MangaListBlock 
-    //                   blockName={readingNow.name}
-    //                   styles={readingNow.styles}
-    //                   list={readingNowInfo} 
-    //                   getList={this.getReading(moduleName)} 
-    //                   openMangaLink={this.openMangaLink(moduleName, isNovel)}
-    //                 />
-    //               </View>
-    //               )}
-    //           </View>
-    //         );
-    //     });
-    // }
 }
 
 const mapDispatchToProps = dispatch => ({

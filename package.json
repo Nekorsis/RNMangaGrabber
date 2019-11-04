@@ -6,6 +6,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "eslint": "eslint .",
+    "expobuild": "expo  build:android",
     "expoC": "expo start -c",
     "ios": "expo start --ios",
     "eject": "expo eject",

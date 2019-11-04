@@ -108,6 +108,10 @@ const appReducer = (state = initialState, action) => {
             return state.imagesInfo.imageCount ? { ...state, imagesInfo: { ...state.imagesInfo, progressBar: progress / state.imagesInfo.imageCount } } :
             state;
         }
+        case actionTypes.SET_MANGA_INFO: {
+            const { mangaInfo } = action.payload;
+            return { ...state, mangaInfo };
+        }
         default:
             break;
         }

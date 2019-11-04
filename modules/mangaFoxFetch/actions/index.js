@@ -10,6 +10,7 @@ import {
     setCategory,
     setBarProgress,
     setImageCount,
+    setMangaInfo,
 } from '../../../actions/common';
 
 const imgSrcRegex = /img.+?src="(.+?)".+?<\/a>/;
@@ -186,6 +187,29 @@ export const searchMangaAsync = (filter) => {
     };
 };
 
+export const getMangaInfo = (htmlText, dispatch) => {
+    const description = htmlText.match(/<p class="detail-info-right-content">.+?<\/p>(.|\n)*?class="fullcontent">((.|\n)*?)<\/p>/);
+    const genres = htmlText.match(/<p class="detail-info-right-tag-list">(.+?)<\/p>/);
+    const genresArray = genres[1] && genres[1].split('<a').reduce((accumulator, value) => {
+        const link = value.match(/href="(.+?)"/);
+        const title = value.match(/title="(.+?)"/);
+        if (!title || !link ) {
+            return accumulator;
+        }
+
+        const block = { 
+            link: link[0] && link[1], 
+            title: title[0] && title[1],
+        };
+        accumulator = [...accumulator, block];
+        return accumulator;
+    }, []);
+    dispatch(setMangaInfo({
+        description: description && description[2],
+        genresArray,
+    }));
+};
+
 export const getMangaChaptersList = (url) => {
     return (dispatch) => {
         dispatch(setLoadingState(true, 'mangaChapters'));
@@ -201,9 +225,10 @@ export const getMangaChaptersList = (url) => {
         }).then((response) => {
             response.text().then((text) => {
                 try {
+                    getMangaInfo(text, dispatch);
                     const searchBlock = text.match(/<ul class="detail-main-list">(.+?)<\/ul>/);
-                    const genreBlocks = searchBlock && searchBlock[0].match(/<li(.+?)<\/li>/g);
-                    const blocks = genreBlocks.reduce((accumulator, value) => {
+                    const mangaItems = searchBlock && searchBlock[0].match(/<li(.+?)<\/li>/g);
+                    const blocks = mangaItems.reduce((accumulator, value) => {
                         const name = value.match(/title="(.*?)"/);
                         const link = value.match(/<a href="\/manga\/(.+?.html)"/);
                         if (!link || !name ) {
@@ -243,7 +268,7 @@ export const fetchChapter = (url, index, preload, withoutProgress = false) => {
                     dispatch(setBarProgress(0));
                 }
                 if (innerPromise) {
-                    innerPromise.cancel('Rejected by another request');
+                    innerPromise.cancel(reason);
                 }
                 dispatch(setMangaChapter(null));
                 resolve(reason);

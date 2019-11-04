@@ -7,7 +7,7 @@ import {
     View,
     FlatList,
     ActivityIndicator,
-    Button,
+    Image,
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -44,21 +44,33 @@ class ChaptersList extends React.Component {
     }
 
     render() {
-        const { store: { mangaChapters: { mangaChaptersList, isLoading } = {} } } = this.props;
+        const { 
+          store: { mangaChapters: { mangaChaptersList, isLoading } = {}, mangaInfo }, 
+        navigation: { state: { params: { manga } = {} } } } = this.props;
         return (
             isLoading ? 
               <ActivityIndicator /> 
             : (
                 <React.Fragment>
-                  {/* <View>
-                    <Button
-                      onPress={this.downloadAllNovel}
-                      title="Download All"
-                      color="#841584"
-                      accessibilityLabel="download All"
-                    />
-                  </View> */}
                   <View style={styles.container}>
+                  {
+                    manga.img && (
+                    <Image
+                      source={{ uri: manga.img }}
+                      style={{
+                        width: 100,
+                        height: 100,
+                      }}
+                    />
+                  )}
+                  { 
+                    mangaInfo && mangaInfo.description && 
+                    <Text style={styles.itemText}>{`${mangaInfo.description}`}</Text>
+                  }
+                  { 
+                    mangaInfo && mangaInfo.genresArray && 
+                    mangaInfo.genresArray.map(item => <Text key={item.title} style={styles.itemText}>{`${item.title}`}</Text>)
+                  }
                     <FlatList
                       data={mangaChaptersList}
                       keyExtractor={this.keyExtractor}

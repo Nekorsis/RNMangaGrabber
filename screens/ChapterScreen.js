@@ -42,7 +42,7 @@ class Chapter extends React.Component {
     };
 
     shouldComponentUpdate(nextProps) {
-        const { imagesPreload: { imagesPreviewList: prevPreviewList }, images: prevImages, navigation, changeLoadingState } = this.props;
+        const { imagesPreload: { imagesPreviewList: prevPreviewList }, images: prevImages, navigation } = this.props;
         const { 
             imagesPreload: { imagesPreviewList: nextPreviewList }, 
             images,
@@ -51,9 +51,6 @@ class Chapter extends React.Component {
         if (prevPreviewList !== nextPreviewList) {
             return false;
         }
-        // if ((chapter === navigation.state.params.chapter) && JSON.stringify(images) === JSON.stringify(prevImages)) {
-        //     return false;
-        // }
 
         if ((chapter === navigation.state.params.chapter) && 
             images.isLoading === prevImages.isLoading && images.progressBar === prevImages.progressBar) {
@@ -71,7 +68,6 @@ class Chapter extends React.Component {
         mangaChaptersList, imagesPreload: { imagesPreviewList,  preloadIndex } } =  this.props;
         const { navigation } =  prevProps;
         if (chapter !== navigation.state.params.chapter) {
-            console.log('componentDidUpdate via chapter change', preloadIndex, index);
             if(preloadIndex === index) {
                 this.setState({ preload: true, list: imagesPreviewList });
                 if (mangaChaptersList.length > index + 1) {
@@ -97,7 +93,6 @@ class Chapter extends React.Component {
 
     componentWillUnmount() {
         const { changeLoadingState, rejectChapterLoad } = this.props;
-        console.log('componentWillUnmount');
         changeLoadingState(true, 'imagesInfo.imagesArray');
         rejectChapterLoad();
     }
@@ -116,14 +111,15 @@ class Chapter extends React.Component {
     renderCorrectView = () => {
         const { navigation: { state: { params: { isNovel = false } = {} } }, images: { imagesList } } =  this.props;
         const { list, preload } = this.state;
-        const imagesArray = preload ? list : imagesList;
-        console.log('tick');
-        console.log('promise leak, chapter return null and works multiple fetches');
+        const imageUrls = preload ? list : imagesList;
+        console.log(!!imageUrls);
         return (
-            isNovel ? 
-                <NovelReader text={imagesArray} /> : 
-                <ImageViewer saveToLocalByLongPress={false} onArrayEnd={this.onLastImage} imageUrls={imagesArray} />
-            );
+        <ImageViewer
+            saveToLocalByLongPress={false} 
+            onArrayEnd={this.onLastImage} 
+            imageUrls={imageUrls || []} 
+        />
+        );
     }
 
     render() {

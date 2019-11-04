@@ -46,15 +46,10 @@ class Site extends React.Component {
     }
 
     componentDidMount() {
-        const { getMangaList, navigation: { state: { params: { moduleName } = {} } }, store, changeModule } = this.props;
+        const { getMangaList, navigation: { state: { params: { moduleName } = {} } }, changeModule } = this.props;
         
         this.moduleName = moduleName || this.moduleName;
 
-        // if(store.moduleName !== this.moduleName) {
-        //     changeModule(this.moduleName);
-        //     getMangaList(this.filter.getFilterString(), this.moduleName);
-        //     this.initializeGenres();
-        // }
         changeModule(this.moduleName);
         getMangaList(this.filter.getFilterString(), this.moduleName);
         this.initializeGenres();
@@ -96,15 +91,15 @@ class Site extends React.Component {
             data={mangaGenres}
             keyExtractor={this.keyExtractor}
             renderItem={({item}) => {
-                    return (
-                      <View key={item.index} style={styles.checkbox}>
-                        <CheckBox value={item.isActive} onValueChange={this.changeCheckbox(item.index)} />
-                        <Text style={styles.checkboxText}>
-                          {item.name}
-                        </Text>
-                      </View>
-                    );
-                }}
+              return (
+                <View key={item.index} style={styles.checkbox}>
+                  <CheckBox value={item.isActive} onValueChange={this.changeCheckbox(item.index)} />
+                  <Text style={styles.checkboxText}>
+                    {item.name}
+                  </Text>
+                </View>
+              );
+            }}
           />
         );
     }

@@ -144,15 +144,16 @@ export const fetchAll = (name, mangaChaptersList) => {
 
 export const rejectChapterLoad = () => {
     return (dispatch, getState) => {
-        const { appReducer: { chapterPromise, preloadChapterPromise } } = getState();
-        console.log('chapter', chapterPromise);
-        if (chapterPromise) {
-            chapterPromise.cancel('Rejected by exit from the chapter reader');
-            dispatch(setMangaChapter(null));
-        }
-        console.log('preload', preloadChapterPromise);
-        if (preloadChapterPromise) {
-            preloadChapterPromise.cancel('Rejected preloadChapterPromise by exit from the chapter reader');
-        }
+        // const { appReducer: { chapterPromise, preloadChapterPromise } } = getState();
+        // console.log('chapter', chapterPromise);
+        // if (chapterPromise) {
+        //     chapterPromise.cancel('Rejected by exit from the chapter reader');
+        //     dispatch(setMangaChapter(null));
+        // }
+        // console.log('preload', preloadChapterPromise);
+        // if (preloadChapterPromise) {
+        //     preloadChapterPromise.cancel('Rejected preloadChapterPromise by exit from the chapter reader');
+        //     dispatch(setMangaChapter(null, true));
+        // }
     }; 
 };

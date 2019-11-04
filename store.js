@@ -30,5 +30,6 @@ export const initState = {
     hotCategories: {},
     readingNowCategories: {},
     recommendedCategories: {},
+    mangaInfo: null,
 };
 export default initState;
