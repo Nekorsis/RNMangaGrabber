@@ -11,6 +11,7 @@ export const actionTypes = {
     SET_CATEGORY: 'SET_CATEGORY',
     SET_PROGRESS_BAR: 'SET_PROGRESS_BAR',
     SET_IMAGE_COUNT: 'SET_IMAGE_COUNT',
+    SET_MANGA_INFO: 'SET_MANGA_INFO',
 };
 
 export const setError = (err) => {
@@ -41,17 +42,17 @@ export const setMangaList = (list) => {
     };
 };
 
-export const saveChapterImages = (imagesArray) => {
+export const saveChapterImages = (imagesArray, index, preload) => {
     return {
         type: actionTypes.SAVE_CHAPTER_IMAGES,
-        payload: { imagesArray },
+        payload: { imagesArray, index, preload },
     };
 };
 
-export const setMangaChapter = (chapterPromise) => {
+export const setMangaChapter = (chapterPromise, preload) => {
     return {
         type: actionTypes.SET_LOADING_CHAPTER,
-        payload: { chapterPromise },
+        payload: { chapterPromise, preload },
     };
 };
 
@@ -71,10 +72,14 @@ export const setCategory = (moduleName, list, category) => {
 
 export const rejectChapterLoad = () => {
     return (dispatch, getState) => {
-        const { appReducer: { chapterPromise } } = getState();
+        const { appReducer: { chapterPromise, preloadChapterPromise } } = getState();
         if (chapterPromise) {
             chapterPromise.cancel('Rejected by exit from the chapter reader');
             dispatch(setMangaChapter(null));
+        }
+        if (preloadChapterPromise) {
+            preloadChapterPromise.cancel('Rejected preloadChapterPromise by exit from the chapter reader');
+            dispatch(setMangaChapter(null, true));
         }
     }; 
 };
@@ -90,5 +95,12 @@ export const setBarProgress = (progress) => {
     return {
         type: actionTypes.SET_PROGRESS_BAR,
         payload: { progress },
+    };
+};
+
+export const setMangaInfo = (mangaInfo) => {
+    return {
+        type: actionTypes.SET_MANGA_INFO,
+        payload: { mangaInfo },
     };
 };

@@ -7,7 +7,7 @@ import {
     View,
     FlatList,
     ActivityIndicator,
-    Button,
+    Image,
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -17,6 +17,12 @@ import { getMangaChaptersList, fetchAll } from '../actions';
 import { screenNames } from '../constants/consts';
 import styles from './styles/ChaptersList';
 
+const DESCRIPTION_LENGTH = 1002;
+
+// TODO сделать описание по кнопке, можно респонсив менять разрешение картинки через transition/animation, чтобы выезжала красиво.
+// текст описания сделать более читабельным. добавить more поддержку.
+// TODO Проработать ссылки жанров. Должны перенаправлять на страницу фильтра, с выбранными жанрами.
+// Разобраться с ломающимся списком мангки выбор с блока --> назад --> переход на страницу сайта --> пропадает список манги
 class ChaptersList extends React.Component {
     static propTypes = {
         navigation: PropTypes.shape({}).isRequired,
@@ -44,37 +50,59 @@ class ChaptersList extends React.Component {
     }
 
     render() {
-        const { store: { mangaChapters: { mangaChaptersList, isLoading } = {} } } = this.props;
+        const { 
+          store: { mangaChapters: { mangaChaptersList, isLoading } = {}, mangaInfo }, 
+        navigation: { state: { params: { manga } = {} } } } = this.props;
         return (
             isLoading ? 
               <ActivityIndicator /> 
             : (
-              <React.Fragment>
-                {/* <View>
-                  <Button
-                    onPress={this.downloadAllNovel}
-                    title="Download All"
-                    color="#841584"
-                    accessibilityLabel="Learn more about this purple button"
-                  />
-                </View> */}
-                <View style={styles.container}>
-                  <FlatList
-                    data={mangaChaptersList}
-                    keyExtractor={this.keyExtractor}
-                    renderItem={({ item, index }) => {
-                        return (
-                          <TouchableOpacity style={styles.touchableOpacity} onPress={() => this.openChapter(item, index)}>
-                            <View style={styles.itemTextContainer}>
-                              <Text style={styles.itemText}>{`${item.name}`}</Text>
-                            </View>
-                          </TouchableOpacity>
-                        );
-                    }}
-                  />
-                </View>
-              </React.Fragment>
-));
+                <React.Fragment>
+                  <View style={styles.container}>
+                  {
+                    manga.img && (
+                    <Image
+                      source={{ uri: manga.img }}
+                      style={{
+                        width: 100,
+                        height: 100,
+                      }}
+                    />
+                  )}
+                  { 
+                    mangaInfo && mangaInfo.description && 
+                    <View style={styles.itemTextContainer}>
+                      <Text style={styles.desctiption}>
+                        {`${mangaInfo.description.slice(0, DESCRIPTION_LENGTH)}${mangaInfo.description.length > DESCRIPTION_LENGTH ? ' more...' : ''}`}
+                      </Text>
+                    </View>
+                  }
+                  { 
+                    mangaInfo && mangaInfo.genresArray &&
+                    <View style={styles.genreTextContainer}>
+                    {mangaInfo.genresArray.map(item => (
+                      <View key={item.title} style={styles.itemTextContainer}>
+                        <Text style={styles.genre}>{`${item.title}`}</Text>
+                      </View>
+                    ))}
+                    </View>
+                  }
+                    <FlatList
+                      data={mangaChaptersList}
+                      keyExtractor={this.keyExtractor}
+                      renderItem={({ item, index }) => {
+                          return (
+                            <TouchableOpacity style={styles.touchableOpacity} onPress={() => this.openChapter(item, index)}>
+                              <View style={styles.itemTextContainer}>
+                                <Text style={styles.itemText}>{`${item.name}`}</Text>
+                              </View>
+                            </TouchableOpacity>
+                          );
+                      }}
+                    />
+                  </View>
+                </React.Fragment>
+              ));
     }
 }
 

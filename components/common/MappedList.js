@@ -7,13 +7,13 @@ import {
   View,
 } from 'react-native';
 
-// import styles from './styles/MangaList';
-
 export default ({ list, openMangaLink, styles }) => {
   const keyExtractor = (item, index) => item.name || index.toString();
+
   const touchableOpacityOnPress = (item) => () => {
     return openMangaLink(item);
   };
+
   return (list.map(
     (item, index) => {
       return (

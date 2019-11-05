@@ -13,6 +13,24 @@ import { actionTypes } from '../actions/common';
 //     return { ...accumulator, [reducerName || `${moduleName}Reducer`]: reducer };
 // }, {});
 
+const getDeep = (state, name, params) => {
+    const deep = name.split('.');
+    const innerObj = deepRec(state, deep, params);
+    return { ...state, [deep[0]]: innerObj };
+};
+
+const deepRec = (obj, deep, params, index = 0, state = {}) => {
+    const newObj = obj[deep[index]];
+    state = { ...obj, [deep[index]]: newObj };
+    if(deep.length === index + 1) {
+        const newObj = { ...obj[deep[index]] , ...params};
+        state = { ...obj, [deep[index]]: newObj };
+        return state;
+    }
+    return deepRec(newObj, deep, params, index + 1, state);
+
+};
+
 const initialNavigatorState = AppNavigator.router.getStateForAction(NavigationActions.init());
 
 const appReducer = (state = initialState, action) => {
@@ -29,8 +47,7 @@ const appReducer = (state = initialState, action) => {
         }
         case actionTypes.SET_LOADING_STATE: {
             const { isLoading, name } = action.payload;
-            return isLoading ? { ...state, [name] : {...state[name], isLoading, err: null } } :
-             { ...state, [name] : {...state[name], isLoading } };
+            return getDeep(state, name, { isLoading, err: false });
         }
         case actionTypes.SET_GENRE_CHECKBOX: {
             const { index, isActive } = action.payload;
@@ -48,18 +65,23 @@ const appReducer = (state = initialState, action) => {
             }
         }
         case actionTypes.SET_LOADING_CHAPTER: {
-            const { chapterPromise } = action.payload;
-            return { ...state, chapterPromise };
+            const { chapterPromise, preload } = action.payload;
+            return { ...state, [preload ? 'preloadChapterPromise' :  'chapterPromise'] : chapterPromise };
         }
         case actionTypes.SET_CHAPTERS_LIST: {
             const { mangaChaptersList } = action.payload;
             return { ...state, mangaChapters: { mangaChaptersList, isLoading: false }, };
         }
         case actionTypes.SAVE_CHAPTER_IMAGES: {
-            const { imagesArray, imagesArray: { err } } = action.payload;
-            return err ? { ...state, imagesInfo: { ...state.imagesInfo, err } }
-            : { ...state, imagesInfo: { ...state.imagesInfo, imagesArray, isLoading: false, err: false } };
-            // return { ...state, imagesInfo: { ...state.imagesInfo, imagesArray, isLoading: false, err } };
+            const { imagesArray, imagesArray: { err }, index, preload, } = action.payload;
+            const infoName = `imagesInfo${preload ? 'Preload' : ''}`;
+            return err ? { ...state, [infoName]: { ...state[infoName], err } } : { 
+                ...state, 
+                [infoName]: {
+                    ...state[infoName],
+                    imagesArray: { list: imagesArray, index, isLoading: false },
+                    err: false,
+                }};
         }
         case actionTypes.SET_HOT_CATEGORY: {
             const { moduleName, hotInfo } = action.payload;
@@ -79,18 +101,23 @@ const appReducer = (state = initialState, action) => {
         }
         case actionTypes.SET_IMAGE_COUNT: {
             const { imageCount } = action.payload;
-            return imageCount ? { ...state, mangaChapters: { ...state.mangaChapters, imageCount } } : state;
+            return imageCount ? { ...state, imagesInfo: { ...state.imagesInfo, imageCount } } : state;
         }
         case actionTypes.SET_PROGRESS_BAR: {
             const { progress } = action.payload;
-            return state.mangaChapters.imageCount ? { ...state, mangaChapters: { ...state.mangaChapters, progressBar: progress / state.mangaChapters.imageCount } } :
+            return state.imagesInfo.imageCount ? { ...state, imagesInfo: { ...state.imagesInfo, progressBar: progress / state.imagesInfo.imageCount } } :
             state;
+        }
+        case actionTypes.SET_MANGA_INFO: {
+            const { mangaInfo } = action.payload;
+            return { ...state, mangaInfo };
         }
         default:
             break;
         }
         return state;
 };
+
 const navReducer = (state = initialNavigatorState, action) => {
     const nextState = AppNavigator.router.getStateForAction(action, state);
     return nextState || state;
@@ -99,7 +126,6 @@ const navReducer = (state = initialNavigatorState, action) => {
 const reducer = combineReducers({
     appReducer,
     nav: navReducer,
-    // ...modulesReducersObj,
 });
 
 export default reducer;
