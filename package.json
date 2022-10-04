@@ -19,7 +19,7 @@
     "@expo/samples": "2.1.1",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
     "babel-preset-expo": "^5.1.1",
-    "expo": "^33.0.0",
+    "expo": "^46.0.14",
     "fast-html-parser": "^1.0.1",
     "prop-types": "^15.6.2",
     "react": "16.8.3",
